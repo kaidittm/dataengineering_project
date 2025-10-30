@@ -9,12 +9,17 @@ x-airflow-common:
     AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
     NETEX_API_KEY: ${NETEX_API_KEY}
     SIRI_API_KEY: ${SIRI_API_KEY}
+    CLICKHOUSE_HOST: clickhouse
+    CLICKHOUSE_PORT: 8123
+    CLICKHOUSE_USER: default
+    CLICKHOUSE_PASSWORD: "ch_pass"
   volumes:
     - ./dags:/opt/airflow/dags
-    - ./logs:/opt/airflow/logs:z
+    - ./logs:/opt/airflow/logs
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     - airflow-db
+    - clickhouse # <-- ADDED: Airflow services now depend on ClickHouse
 
 services:
   # --- Airflow metadata database ---
@@ -46,6 +51,26 @@ services:
     depends_on:
       - airflow-db
 
+  # --- ClickHouse Database Service ---
+  clickhouse: 
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "8123:8123"
+      - "9000:9000" 
+    environment:
+      CLICKHOUSE_USER: default 
+      CLICKHOUSE_PASSWORD: ch_pass
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    # entrypoint: /bin/bash -c "chown -R 101:101 /var/lib/clickhouse && /entrypoint.sh"
+    user: "101:101"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8123/"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    restart: always
+
   # --- Airflow DB initialization & user setup ---
   airflow-init:
     <<: *airflow-common
@@ -68,9 +93,10 @@ services:
     <<: *airflow-common
     command: webserver
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - airflow-init
+      - clickhouse 
     restart: always
 
   # --- Airflow Scheduler ---
@@ -79,7 +105,9 @@ services:
     command: scheduler
     depends_on:
       - airflow-init
+      - clickhouse 
     restart: always
 
 volumes:
   pgdata_airflow:
+  clickhouse_data:
