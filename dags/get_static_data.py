@@ -9,12 +9,19 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 import logging
+import clickhouse_connect
 
 logger = logging.getLogger(__name__)
 
 operator = 'orebro'
 NETEX_API_KEY = os.getenv('NETEX_API_KEY')
 NETEX_API_URL = f"https://opendata.samtrafiken.se/netex/{operator}/{operator}.zip?key={NETEX_API_KEY}"
+
+# ClickHouse connection settings
+CLICKHOUSE_HOST = os.getenv('CLICKHOUSE_HOST', 'clickhouse')
+CLICKHOUSE_PORT = int(os.getenv('CLICKHOUSE_PORT', 8123))
+CLICKHOUSE_USER = os.getenv('CLICKHOUSE_USER', 'default')
+CLICKHOUSE_PASSWORD = os.getenv('CLICKHOUSE_PASSWORD', '')
 
 def download_zip(url: str) -> bytes:
     """Download ZIP file with proper error handling."""
@@ -308,6 +315,128 @@ def get_static_netex(**ctx):
         logger.error(f"Error processing NeTEx data: {e}")
         raise
 
+    
+STATIC_BRONZE_TABLES = {
+    'netex_scheduled_stop_points': 'bronze_netex_scheduled_stop_points',
+    'netex_topographic_places':   'bronze_netex_topographic_places',
+    'netex_stop_places':          'bronze_netex_stop_places',
+    'netex_quays':                'bronze_netex_quays',
+    'netex_lines':                'bronze_netex_lines',
+    'netex_journey_patterns':     'bronze_netex_journey_patterns',
+    'netex_journey_pattern_stops':'bronze_netex_journey_pattern_stops'
+}
+
+
+def _get_clickhouse_client():
+    return clickhouse_connect.get_client(
+        host=CLICKHOUSE_HOST,
+        port=CLICKHOUSE_PORT,
+        user=CLICKHOUSE_USER,
+        password=CLICKHOUSE_PASSWORD,
+        database='default'
+    )
+
+def create_static_bronze_tables(**ctx):
+    """
+    Create bronze tables if they don't exist.
+    Schemas are intentionally permissive (strings / datetimes) because NetEx payloads vary.
+    You can tighten column types later if desired.
+    """
+    client = _get_clickhouse_client()
+    for src_name, ch_table in STATIC_BRONZE_TABLES.items():
+        # simple permissive schema; add more columns per dataset if you want typed ingestion
+        ddl = (
+            f"CREATE TABLE IF NOT EXISTS {ch_table} ("
+            "dataset String, "               # dataset identifier (src_name)
+            "id String, "                    # primary id where present
+            "version String NULL, "
+            "payload String, "               # raw row serialized as JSON (fallback)
+            "Ingestion_Timestamp DateTime64(3), "
+            "Ingestion_Date Date"
+            ") ENGINE = MergeTree() "
+            "PARTITION BY Ingestion_Date "
+            "ORDER BY (dataset, id, Ingestion_Timestamp)"
+        )
+        client.command(ddl)
+        print(f"Ensured ClickHouse table exists: {ch_table}")
+
+def load_static_to_clickhouse(**ctx):
+    """
+    Read the CSVs that get_static_netex wrote (or read DataFrames returned via XCom),
+    add ingestion metadata and insert idempotently into ClickHouse bronze tables.
+    This implementation tries to pull DataFrames from XCom; if not present, it will
+    attempt to load the CSVs from the output folder created by get_static_netex.
+    """
+    ti = ctx['ti']
+    client = _get_clickhouse_client()
+
+    # Try to get DataFrames via XCom (if you modified get_static_netex to return them).
+    # Fallback: look for CSV files in data/static/*.csv (the same paths your function writes).
+    out_dir = os.path.join(os.getcwd(), 'data', 'static')
+    if not os.path.isdir(out_dir):
+        print(f"No static output directory found at {out_dir}. Nothing to load.")
+        return
+
+    # ingestion timestamp / date for idempotency (use current run date)
+    ingestion_ts = pd.Timestamp.utcnow().to_pydatetime()
+    # If Airflow provides ctx['ds'] it's ideal; try to convert, else use today
+    ingestion_date = None
+    try:
+        ds_str = ctx.get('ds')  # e.g., '2025-10-29'
+        ingestion_date = pd.to_datetime(ds_str).date()
+    except Exception:
+        ingestion_date = pd.Timestamp.utcnow().date()
+
+    # iterate CSVs written by get_static_netex
+    for filename in os.listdir(out_dir):
+        if not filename.lower().endswith('.csv'):
+            continue
+        fullpath = os.path.join(out_dir, filename)
+        # derive dataset key from filename, e.g. netex_lines_20251030T...csv -> netex_lines
+        base = filename.split('_')[0] if '_' in filename else os.path.splitext(filename)[0]
+        # more robust attempt: handle filenames like netex_lines_2025... => join first two parts
+        parts = filename.split('_')
+        if len(parts) >= 2 and parts[0].lower().startswith('netex'):
+            dataset_key = "_".join(parts[0:2])  # e.g., netex_lines
+        else:
+            dataset_key = parts[0]
+
+        ch_table = STATIC_BRONZE_TABLES.get(dataset_key)
+        if not ch_table:
+            print(f"No ClickHouse mapping for dataset '{dataset_key}', skipping file {filename}")
+            continue
+
+        print(f"Loading file {fullpath} into ClickHouse table {ch_table} (Ingestion_Date={ingestion_date})")
+        try:
+            df = pd.read_csv(fullpath, dtype=str)  # read as strings to avoid type issues
+            # Add metadata columns
+            df['dataset'] = dataset_key
+            # Use an 'id' column if present, else null
+            if 'id' not in df.columns and 'ID' in df.columns:
+                df['id'] = df['ID']
+            if 'id' not in df.columns:
+                # create synthetic id based on row number if no id exists
+                df['id'] = df.index.astype(str)
+
+            df['version'] = df.get('version', None)
+            df['Ingestion_Timestamp'] = ingestion_ts
+            df['Ingestion_Date'] = ingestion_date
+            # Ensure a payload column with JSON string of the row for schema-flexible storage
+            # if there is no single canonical set of columns for NetEx outputs
+            df['payload'] = df.apply(lambda row: row.to_json(force_ascii=False), axis=1)
+
+            # Idempotency: delete any existing rows for this ingestion date and dataset
+            client.command(f"ALTER TABLE {ch_table} DELETE WHERE Ingestion_Date = '{ingestion_date}' AND dataset = '{dataset_key}'")
+            # Insert using the helper (clickhouse_connect supports insert_df)
+            # Make sure the dataframe columns match the table: (dataset,id,version,payload,Ingestion_Timestamp,Ingestion_Date)
+            insert_df = df[['dataset','id','version','payload','Ingestion_Timestamp','Ingestion_Date']].copy()
+            client.insert_df(table=ch_table, df=insert_df)
+            print(f"Inserted {len(insert_df)} rows into {ch_table}")
+
+        except Exception as e:
+            print(f"Error loading {fullpath} to ClickHouse table {ch_table}: {e}")
+            raise
+
 with DAG(
     dag_id="get_static_netex",
     start_date=days_ago(1),
@@ -321,3 +450,16 @@ with DAG(
         python_callable=get_static_netex,
         provide_context=True
     )
+    
+    create_table_task = PythonOperator(
+        task_id="create_static_bronze_tables",
+        python_callable=create_static_bronze_tables,
+    )
+
+    load_task = PythonOperator(
+        task_id="load_static_to_clickhouse",
+        python_callable=load_static_to_clickhouse,
+        provide_context=True,
+    )
+    
+    create_table_task >> fetch_static >> load_task
