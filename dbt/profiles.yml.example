@@ -1,0 +1,20 @@
+# Example profiles.yml for local dbt runs
+# Copy this to ~/.dbt/profiles.yml and set the values or export env vars used below
+
+dataengineering_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      schema: default
+      host: clickhouse  # service name from docker-compose
+      port: 8123
+      user: default
+      password: "ch_pass"
+      secure: false
+
+# Alternatively set environment variables before running dbt:
+# setx CLICKHOUSE_HOST "clickhouse"
+# setx CLICKHOUSE_HTTP_PORT "8123"
+# setx CLICKHOUSE_USER "default"
+# setx CLICKHOUSE_PASSWORD "ch_pass"

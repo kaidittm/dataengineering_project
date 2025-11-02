@@ -1,0 +1,16 @@
+name: dataengineering_dbt
+version: '1.0'
+profile: dataengineering_dbt
+config-version: 2
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+
+models:
+  dataengineering_dbt:
+    staging:
+      +materialized: view
+    silver:
+      +materialized: view
+    gold:
+      +materialized: table

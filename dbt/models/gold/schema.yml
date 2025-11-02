@@ -1,0 +1,98 @@
+version: 2
+models:
+  - name: fact_movements
+    description: "Fact table of vehicle movements (Events)."
+    columns:
+      - name: event_id
+        description: "Surrogate event key."
+        tests:
+          - unique
+          - not_null
+      - name: service_journey_id
+        description: "Service journey identifier."
+        tests:
+          - not_null
+      - name: quay_id
+        description: "Quay identifier."
+        tests:
+          - not_null
+      - name: stop_point_id
+        description: "StopPoint identifier."
+      - name: date_id
+        description: "Date surrogate key."
+      - name: line_id
+        description: "Line identifier."
+      - name: route_id
+        description: "Route identifier."
+      - name: direction
+        description: "Direction of travel."
+      - name: vehicle_mode
+        description: "Vehicle mode (bus, rail, etc.)."
+      - name: aimed_arrival_time
+        description: "Planned arrival timestamp."
+      - name: actual_arrival_time
+        description: "Actual arrival timestamp."
+      - name: aimed_departure_time
+        description: "Planned departure timestamp."
+      - name: actual_departure_time
+        description: "Actual departure timestamp."
+      - name: arrival_status
+        description: "Arrival status (on time, delayed, etc.)."
+      - name: departure_status
+        description: "Departure status (on time, delayed, etc.)."
+      - name: cancellation
+        description: "Cancellation flag."
+      - name: departure_boarding_activity
+        description: "Boarding activity at departure."
+      - name: ingestion_date
+        description: "Ingestion date."
+  - name: dim_line
+    description: "Dimension table for lines."
+    columns:
+      - name: line_id
+        description: "Line identifier."
+        tests:
+          - unique
+          - not_null
+      - name: name
+        description: "Line name."
+      - name: public_code
+        description: "Public code for the line."
+      - name: route_id
+        description: "Route identifier."
+      - name: direction
+        description: "Direction of travel."
+  - name: dim_quay
+    description: "Dimension table for quays."
+    columns:
+      - name: quay_id
+        description: "Quay identifier."
+        tests:
+          - unique
+          - not_null
+      - name: stop_point_id
+        description: "StopPoint identifier."
+      - name: quay_name
+        description: "Quay name."
+      - name: location
+        description: "Quay location."
+      - name: parent_stop_point_id
+        description: "Parent StopPoint identifier."
+  - name: dim_service_journey
+    description: "Dimension table for service journeys."
+    columns:
+      - name: service_journey_id
+        description: "Service journey identifier."
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        description: "Date surrogate key."
+      - name: direction
+        description: "Direction of travel."
+      - name: vehicle_mode
+        description: "Vehicle mode (bus, rail, etc.)."
+      - name: line_id
+        description: "Line identifier."
+      - name: route_id
+        description: "Route identifier."
