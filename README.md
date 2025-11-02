@@ -39,7 +39,10 @@ Substitute `<datetime>` for any valid value, for example `2025-10-27T21:54:00+00
 
 ## Screenshots or visuals of Airflow and dbt DAGs
 
-<img width="1899" height="528" alt="image" src="https://github.com/user-attachments/assets/3b16028c-281e-4969-83f2-17c42d896111" />
+A list of all our Airflow DAGs.
+<img width="1899" height="528" alt="image" src="https://github.com/user-attachments/assets/3b16028c-281e-4969-83f2-17c42d896111"/>
+
+Our static data DAG with a task related dbt.
 <img width="1897" height="881" alt="image" src="https://github.com/user-attachments/assets/0d08e5e5-b458-415c-84e0-2e5034b43453" />
 
 ## dbt setup for our project
