@@ -35,3 +35,10 @@ ls logs/dag_id=get_live_data/run_id=scheduled__<datetime>/task_id=get_live_data
 ```
 
 Substitute `<datetime>` for any valid value, for example `2025-10-27T21:54:00+00:00`.
+
+
+## Screenshots or visuals of Airflow and dbt DAGs
+
+<img width="1899" height="528" alt="image" src="https://github.com/user-attachments/assets/3b16028c-281e-4969-83f2-17c42d896111" />
+<img width="1897" height="881" alt="image" src="https://github.com/user-attachments/assets/0d08e5e5-b458-415c-84e0-2e5034b43453" />
+
