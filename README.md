@@ -42,3 +42,23 @@ Substitute `<datetime>` for any valid value, for example `2025-10-27T21:54:00+00
 <img width="1899" height="528" alt="image" src="https://github.com/user-attachments/assets/3b16028c-281e-4969-83f2-17c42d896111" />
 <img width="1897" height="881" alt="image" src="https://github.com/user-attachments/assets/0d08e5e5-b458-415c-84e0-2e5034b43453" />
 
+## dbt setup for our project
+
+### Setup
+- Copy `profiles.yml.example` to your local `~/.dbt/profiles.yml` and set credentials via env vars or edit directly.
+- Install dbt and ClickHouse adapter:
+  ```powershell
+  pip install dbt-core dbt-clickhouse clickhouse-connect
+  ```
+- Run models:
+  ```powershell
+  dbt run
+  dbt test
+  ```
+
+### Medallion Layers
+- Bronze: loaded by Airflow DAGs into ClickHouse tables (see `get_static_data.py` and `get_live_data.py`).
+- Silver: cleaning/deduplication models in `models/silver/`.
+- Gold: fact/dimension models in `models/gold/`.
+
+
