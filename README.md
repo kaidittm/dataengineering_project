@@ -46,7 +46,7 @@ Substitute `<datetime>` for any valid value, for example `2025-10-27T21:54:00+00
 
 <figure>
   <img width="1897" height="881" alt="image" src="https://github.com/user-attachments/assets/0d08e5e5-b458-415c-84e0-2e5034b43453" />
-  <caption>Our static data DAG with a task related dbt.</caption>
+  <caption>Our static data DAG with a task related to dbt.</caption>
 </figure>
 
 ## dbt setup for our project
