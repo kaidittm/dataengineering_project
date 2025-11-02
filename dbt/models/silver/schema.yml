@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: silver_timetable
+    description: "Cleaned and standardized timetable data from bronze_live_timetable"
+    columns:
+      - name: ServiceJourneyId
+        description: "Unique identifier for a service journey"
+        tests:
+          - not_null
+      - name: QuayId
+        description: "Stop/platform identifier"
+        tests:
+          - not_null
+      - name: StopPointId
+        description: "Parent stop point identifier"
+      - name: LineId
+        description: "Line identifier"
+        tests:
+          - not_null
+      - name: RouteId
+        description: "Route identifier"
+      - name: DirectionRef
+        description: "Direction of travel"
+      - name: VehicleMode
+        description: "Mode of transport (bus, train, etc.)"
+      - name: AimedArrivalTime
+        description: "Scheduled arrival time"
+      - name: ActualArrivalTime
+        description: "Actual arrival time"
+      - name: AimedDepartureTime
+        description: "Scheduled departure time"
+      - name: ActualDepartureTime
+        description: "Actual departure time"
+      - name: ArrivalStatus
+        description: "Status of arrival (onTime, delayed, etc.)"
+      - name: DepartureStatus
+        description: "Status of departure (onTime, delayed, etc.)"
+      - name: Cancellation
+        description: "Whether the service was cancelled"
+      - name: DepartureBoardingActivity
+        description: "Passenger boarding activity at departure"
+      - name: Ingestion_Date
+        description: "Date when the record was ingested"
+        tests:
+          - not_null
+
+  - name: silver_lines
+    description: "Cleaned and deduplicated line information from bronze_netex_lines"
+    columns:
+      - name: LineId
+        description: "Unique line identifier"
+        tests:
+          - unique
+          - not_null
+      - name: Name
+        description: "Line name"
+      - name: PublicCode
+        description: "Public-facing line code or number"
+      - name: Version
+        description: "Data version from source"
+      - name: Ingestion_Date
+        description: "Date when the record was ingested"
+        tests:
+          - not_null

@@ -1,0 +1,18 @@
+# Minimal Dockerfile for dbt + dbt-clickhouse + clickhouse-connect
+FROM python:3.11-slim
+
+WORKDIR /dbt
+
+# Install system dependencies for building some Python packages
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc \
+        libffi-dev \
+        git \
+        curl && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install dbt-core and adapters
+RUN pip install --no-cache-dir dbt-core dbt-clickhouse clickhouse-connect

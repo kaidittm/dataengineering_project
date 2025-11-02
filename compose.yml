@@ -16,10 +16,12 @@ x-airflow-common:
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
+    - ./data:/opt/airflow/data
+    - ./dbt:/opt/airflow/dbt
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     - airflow-db
-    - clickhouse # <-- ADDED: Airflow services now depend on ClickHouse
+    - clickhouse
 
 services:
   # --- Airflow metadata database ---
@@ -62,7 +64,6 @@ services:
       CLICKHOUSE_PASSWORD: ch_pass
     volumes:
       - clickhouse_data:/var/lib/clickhouse
-    # entrypoint: /bin/bash -c "chown -R 101:101 /var/lib/clickhouse && /entrypoint.sh"
     user: "101:101"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8123/"]
@@ -71,6 +72,29 @@ services:
       retries: 5
     restart: always
 
+  # --- dbt + ClickHouse service ---
+  # This service doesn't run continuously - it's invoked by Airflow via 'docker compose run'
+  dbt:
+    build:
+      context: .
+      dockerfile: Dockerfile.dbt
+    image: dbt-clickhouse:latest
+    profiles:
+      - dbt
+    volumes:
+      - ./dbt:/dbt
+    working_dir: /dbt
+    environment:
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_HTTP_PORT: 8123
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: ch_pass
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_SCHEMA: analytics
+    depends_on:
+      - clickhouse
+    network_mode: bridge
+
   # --- Airflow DB initialization & user setup ---
   airflow-init:
     <<: *airflow-common
@@ -78,14 +102,15 @@ services:
     command:
       - -c
       - |
-        airflow db init
+        /opt/airflow/scripts/wait_for_services.sh && \
+        airflow db init && \
         airflow users create \
           --username airflow \
           --password airflow \
           --firstname Admin \
           --lastname User \
           --role Admin \
-          --email admin@example.com
+          --email admin@example.com || true
     restart: "no"
 
   # --- Airflow Webserver ---
@@ -96,7 +121,7 @@ services:
       - "8081:8080"
     depends_on:
       - airflow-init
-      - clickhouse 
+      - clickhouse
     restart: always
 
   # --- Airflow Scheduler ---
@@ -105,7 +130,7 @@ services:
     command: scheduler
     depends_on:
       - airflow-init
-      - clickhouse 
+      - clickhouse
     restart: always
 
 volumes:
