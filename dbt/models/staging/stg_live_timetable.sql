@@ -1,5 +1,4 @@
 -- Staging model: SIRI live timetable from bronze
--- Staging model: SIRI live timetable from bronze
 -- Expanded to expose all Bronze columns expected by downstream silver/gold models.
 select
   ServiceJourneyId,
