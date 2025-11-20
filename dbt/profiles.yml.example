@@ -7,7 +7,7 @@ dataengineering_dbt:
     dev:
       type: clickhouse
       schema: default
-      host: clickhouse  # service name from docker-compose
+      host: "{{ env_var('CLICKHOUSE_HOST', 'localhost') }}"
       port: 8123
       user: default
       password: "ch_pass"
