@@ -1,6 +1,7 @@
 -- Silver layer: clean stop places with all required fields
 select
-  StopPointId,
+  StopPlaceId,
+  --StopPointId,
   Name,
   ShortName,
   Centroid_Long,

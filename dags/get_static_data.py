@@ -148,7 +148,10 @@ def parse_stop_places_and_quays(xml_root: etree._Element) -> Tuple[pd.DataFrame,
                     quays.append({
                         'id': quay_el.get('id'),
                         'version': quay_el.get('version'),
-                        'stopPlaceId': el_dict['id']
+                        # 'stopPlaceId': el_dict['id'],
+                        # 'name': el_dict['Name'],
+                        # 'Centroid_Long': el_dict['Centroid_Long'],
+                        # 'Centroid_Lat': el_dict['Centroid_Lat']
                     })
         stops_list.append(el_dict)
     return pd.DataFrame(stops_list), pd.DataFrame(quays)

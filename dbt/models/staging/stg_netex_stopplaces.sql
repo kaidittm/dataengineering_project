@@ -1,7 +1,9 @@
 -- Staging model: NeTEx stop places from bronze
 -- Expanded to expose all Bronze columns expected by downstream silver/gold models.
 SELECT
-  JSONExtractString(payload, 'StopPointId') AS StopPointId,
+  --id,
+  JSONExtractString(payload, 'id') AS StopPlaceId,
+--  JSONExtractString(payload, 'StopPointId') AS StopPointId,
   JSONExtractString(payload, 'Name') AS Name,
   JSONExtractString(payload, 'ShortName') AS ShortName,
   JSONExtractFloat(payload, 'Centroid_Long') AS Centroid_Long,
@@ -10,4 +12,4 @@ SELECT
   JSONExtractString(payload, 'ParentStopPlaceId') AS ParentStopPlaceId,
   Ingestion_Date AS Ingestion_Date
 FROM bronze_netex_stop_places
-WHERE JSONExtractString(payload, 'StopPointId') IS NOT NULL
+WHERE JSONExtractString(payload, 'id') IS NOT NULL
