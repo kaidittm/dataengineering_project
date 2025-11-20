@@ -3,3 +3,4 @@
 logs/*
 pgdata_airflow/*
 dbt/target
+dbt/profiles.yml
