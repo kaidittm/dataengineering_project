@@ -43,7 +43,7 @@ For this:
 #### Set up itself
 
 1. Before any code can be run, you must create a copy of the `.env.template` file named `.env` and add the API-keys for both static (NETEX) and live (SIRI) data as shown in the template.
-2. Also copy `profiles.yml.example` to your local `~/.dbt/profiles.yml` and set credentials via env vars or edit directly.
+2. Also copy `~/dbt/profiles.yml.example` to your local `~/dbt/profiles.yml` and set credentials via env vars or edit directly.
 3. Make sure your Docker Engine is running and run `docker compose build` to install the required python packages.
 4. Run `docker compose up -d`.
 5.  Install dbt and ClickHouse adapter:
