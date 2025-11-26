@@ -60,10 +60,12 @@ services:
       - "8123:8123"
       - "9000:9000" 
     environment:
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
       CLICKHOUSE_USER: default 
       CLICKHOUSE_PASSWORD: ch_pass
     volumes:
       - clickhouse_data:/var/lib/clickhouse
+      - ./sql:/sql
     user: "101:101"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8123/"]
@@ -135,4 +137,5 @@ services:
 
 volumes:
   pgdata_airflow:
+
   clickhouse_data:
