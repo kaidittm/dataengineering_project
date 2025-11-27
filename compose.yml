@@ -68,6 +68,7 @@ services:
       CLICKHOUSE_PASSWORD: ch_pass
     volumes:
       - clickhouse_data:/var/lib/clickhouse
+      - ./sql:/sql
     user: "101:101"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8123/"]
