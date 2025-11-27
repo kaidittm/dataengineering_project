@@ -1,9 +1,9 @@
-x-airflow-common:
-  &airflow-common
+x-airflow-common: &airflow-common
   build: .
-  environment:
-    &airflow-common-env
+  environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    # NOTE: You will need to add environment variables here for OpenMetadata access within Airflow DAGs
+    AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_GENERATED_CONFIGS: "/opt/airflow/dag_generated_configs"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
@@ -22,6 +22,8 @@ x-airflow-common:
   depends_on:
     - airflow-db
     - clickhouse
+    # Add dependency on OM server if Airflow needs to wait for it
+    # - openmetadata-server
 
 services:
   # --- Airflow metadata database ---
@@ -54,13 +56,15 @@ services:
       - airflow-db
 
   # --- ClickHouse Database Service ---
-  clickhouse: 
+  clickhouse:
+    container_name: clickhouse-server-project
     image: clickhouse/clickhouse-server:latest
     ports:
       - "8123:8123"
-      - "9000:9000" 
+      - "9000:9000"
     environment:
-      CLICKHOUSE_USER: default 
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1 # https://clickhouse.com/docs/operations/settings/settings-users#access_management-user-setting
+      CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: ch_pass
     volumes:
       - clickhouse_data:/var/lib/clickhouse
@@ -73,14 +77,11 @@ services:
     restart: always
 
   # --- dbt + ClickHouse service ---
-  # This service doesn't run continuously - it's invoked by Airflow via 'docker compose run'
   dbt:
     build:
       context: .
       dockerfile: Dockerfile.dbt
     image: dbt-clickhouse:latest
-    profiles:
-      - dbt
     volumes:
       - ./dbt:/dbt
     working_dir: /dbt
@@ -93,6 +94,8 @@ services:
       CLICKHOUSE_SCHEMA: analytics
     depends_on:
       - clickhouse
+    # Note: 'network_mode: bridge' can cause issues if this container needs to talk to the new OM containers using service names.
+    # Standard networking is recommended for inter-service communication.
     network_mode: bridge
 
   # --- Airflow DB initialization & user setup ---
@@ -102,6 +105,7 @@ services:
     command:
       - -c
       - |
+        mkdir -p /opt/airflow/dag_generated_configs && \
         /opt/airflow/scripts/wait_for_services.sh && \
         airflow db init && \
         airflow users create \
@@ -133,6 +137,269 @@ services:
       - clickhouse
     restart: always
 
+  # --- OPENMETADATA SERVICES START HERE ---
+
+  # --- OPENMETADATA SERVICES START HERE (Corrected Image Names) ---
+
+  # OpenMetadata requires its own MySQL DB
+  # OpenMetadata requires an Elasticsearch instance
+  # The main OpenMetadata server API and UI
+  # The ingestion container
+  openmetadata-ingestion:
+    image: openmetadata/ingestion:latest # CORRECTED IMAGE NAME
+    command: ["tail", "-f", "/dev/null"]
+
+  openmetadata-mysql:
+    container_name: openmetadata_mysql
+    # Using public MySQL image instead of the private docker.getcollate.io one
+    image: mysql:8.0
+    command: "--sort_buffer_size=10M"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: openmetadata_password
+      MYSQL_USER: openmetadata_user
+      MYSQL_PASSWORD: openmetadata_password
+      MYSQL_DATABASE: openmetadata_db
+    expose:
+      - 3306
+    ports:
+      - "3307:3306" # Mapped to 3307 to avoid potential conflicts with other services
+    volumes:
+      # Use a named volume or adjust path if you want specific host mapping
+      - openmetadata-db-data:/var/lib/mysql
+    healthcheck:
+      test: mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --silent --execute "use openmetadata_db"
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  openmetadata-elasticsearch:
+    container_name: openmetadata_elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.4
+    environment:
+      - discovery.type=single-node
+      # Memory allocation for ES (already set to 1GB Xms/Xmx which is good)
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    healthcheck:
+      test: "curl -s http://localhost:9200/_cluster/health?pretty | grep status | grep -qE 'green|yellow' || exit 1"
+      interval: 30s # Increased interval
+      timeout: 10s
+      retries: 20 # Increased retries (allows up to 10 minutes total startup time)
+    volumes:
+      - openmetadata-es-data:/usr/share/elasticsearch/data
+
+  # This service runs the migrations ONCE and then stops
+  execute-migrate-all:
+    container_name: execute_migrate_all
+    # Using public OpenMetadata Server image
+    image: openmetadata/server:1.3.1
+    command: "./bootstrap/openmetadata-ops.sh migrate --force"
+    # Ensure this runs after DB and ES are healthy
+    depends_on:
+      openmetadata-mysql:
+        condition: service_healthy
+      openmetadata-elasticsearch:
+        condition: service_healthy
+    environment:
+      # Update DB_HOST and ELASTICSEARCH_HOST to match the service names defined here
+      DB_HOST: openmetadata-mysql
+      DB_USER: openmetadata_user # <--- Add this line
+      DB_USER_PASSWORD: openmetadata_password
+      ELASTICSEARCH_HOST: openmetadata-elasticsearch
+      DB_DATABASE: openmetadata_db # <--- Add this line, replacing OM_DATABASE
+
+      # Other variables you provided from the university session (keep as is)
+      # ... (include ALL environment variables from your previous message here) ...
+      OPENMETADATA_CLUSTER_NAME: ${OPENMETADATA_CLUSTER_NAME:-openmetadata}
+      SERVER_PORT: ${SERVER_PORT:-8585}
+      # ... (rest of your extensive environment variable list) ...
+
+      # OpenMetadata Server Authentication Configuration
+      AUTHORIZER_CLASS_NAME: ${AUTHORIZER_CLASS_NAME:-org.openmetadata.service.security.DefaultAuthorizer}
+      AUTHORIZER_REQUEST_FILTER: ${AUTHORIZER_REQUEST_FILTER:-org.openmetadata.service.security.JwtFilter}
+      AUTHORIZER_ADMIN_PRINCIPALS: ${AUTHORIZER_ADMIN_PRINCIPALS:-[admin]}
+      AUTHORIZER_ALLOWED_REGISTRATION_DOMAIN: ${AUTHORIZER_ALLOWED_REGISTRATION_DOMAIN:-["all"]}
+      AUTHORIZER_INGESTION_PRINCIPALS: ${AUTHORIZER_INGESTION_PRINCIPALS:-[ingestion-bot]}
+      AUTHORIZER_PRINCIPAL_DOMAIN: ${AUTHORIZER_PRINCIPAL_DOMAIN:-"open-metadata.org"}
+      AUTHORIZER_ALLOWED_DOMAINS: ${AUTHORIZER_ALLOWED_DOMAINS:-[]}
+      AUTHORIZER_ENFORCE_PRINCIPAL_DOMAIN: ${AUTHORIZER_ENFORCE_PRINCIPAL_DOMAIN:-false}
+      AUTHORIZER_ENABLE_SECURE_SOCKET: ${AUTHORIZER_ENABLE_SECURE_SOCKET:-false}
+      AUTHENTICATION_PROVIDER: ${AUTHENTICATION_PROVIDER:-basic}
+      AUTHENTICATION_RESPONSE_TYPE: ${AUTHENTICATION_RESPONSE_TYPE:-id_token}
+      CUSTOM_OIDC_AUTHENTICATION_PROVIDER_NAME: ${CUSTOM_OIDC_AUTHENTICATION_PROVIDER_NAME:-""}
+      AUTHENTICATION_PUBLIC_KEYS: ${AUTHENTICATION_PUBLIC_KEYS:-[http://localhost:8585/api/v1/system/config/jwks]}
+      AUTHENTICATION_AUTHORITY: ${AUTHENTICATION_AUTHORITY:-https://accounts.google.com}
+      AUTHENTICATION_CLIENT_ID: ${AUTHENTICATION_CLIENT_ID:-""}
+      AUTHENTICATION_CALLBACK_URL: ${AUTHENTICATION_CALLBACK_URL:-""}
+      AUTHENTICATION_JWT_PRINCIPAL_CLAIMS: ${AUTHENTICATION_JWT_PRINCIPAL_CLAIMS:-[email,preferred_username,sub]}
+      AUTHENTICATION_JWT_PRINCIPAL_CLAIMS_MAPPING: ${AUTHENTICATION_JWT_PRINCIPAL_CLAIMS_MAPPING:-[]}
+      AUTHENTICATION_ENABLE_SELF_SIGNUP: ${AUTHENTICATION_ENABLE_SELF_SIGNUP:-true}
+      AUTHENTICATION_CLIENT_TYPE: ${AUTHENTICATION_CLIENT_TYPE:-public}
+      #For OIDC Authentication, when client is confidential
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-""}
+      OIDC_TYPE: ${OIDC_TYPE:-""} # google, azure etc.
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-""}
+      OIDC_SCOPE: ${OIDC_SCOPE:-"openid email profile"}
+      OIDC_DISCOVERY_URI: ${OIDC_DISCOVERY_URI:-""}
+      OIDC_USE_NONCE: ${OIDC_USE_NONCE:-true}
+      OIDC_PREFERRED_JWS: ${OIDC_PREFERRED_JWS:-"RS256"}
+      OIDC_RESPONSE_TYPE: ${OIDC_RESPONSE_TYPE:-"code"}
+      OIDC_DISABLE_PKCE: ${OIDC_DISABLE_PKCE:-true}
+      OIDC_CALLBACK: ${OIDC_CALLBACK:-"http://localhost:8585/callback"}
+      OIDC_SERVER_URL: ${OIDC_SERVER_URL:-"http://localhost:8585"}
+      OIDC_CLIENT_AUTH_METHOD: ${OIDC_CLIENT_AUTH_METHOD:-"client_secret_post"}
+      OIDC_TENANT: ${OIDC_TENANT:-""}
+      OIDC_MAX_CLOCK_SKEW: ${OIDC_MAX_CLOCK_SKEW:-""}
+      OIDC_CUSTOM_PARAMS: ${OIDC_CUSTOM_PARAMS:-{}}
+      OIDC_MAX_AGE: ${OIDC_MAX_AGE:-"0"}
+      OIDC_PROMPT_TYPE: ${OIDC_PROMPT_TYPE:-"consent"}
+      OIDC_SESSION_EXPIRY: ${OIDC_SESSION_EXPIRY:-"604800"}
+
+      # JWT Configuration
+      RSA_PUBLIC_KEY_FILE_PATH: ${RSA_PUBLIC_KEY_FILE_PATH:-"./conf/public_key.der"}
+      RSA_PRIVATE_KEY_FILE_PATH: ${RSA_PRIVATE_KEY_FILE_PATH:-"./conf/private_key.der"}
+      JWT_ISSUER: ${JWT_ISSUER:-"open-metadata.org"}
+      JWT_KEY_ID: ${JWT_KEY_ID:-"Gb389a-9f76-gdjs-a92j-0242bk94356"}
+      # OpenMetadata Server Pipeline Service Client Configuration
+      PIPELINE_SERVICE_CLIENT_ENDPOINT: ${PIPELINE_SERVICE_CLIENT_ENDPOINT:-http://ingestion:8080}
+      PIPELINE_SERVICE_CLIENT_HEALTH_CHECK_INTERVAL: ${PIPELINE_SERVICE_CLIENT_HEALTH_CHECK_INTERVAL:-300}
+      SERVER_HOST_API_URL: ${SERVER_HOST_API_URL:-http://openmetadata-server:8585/api}
+      PIPELINE_SERVICE_CLIENT_VERIFY_SSL: ${PIPELINE_SERVICE_CLIENT_VERIFY_SSL:-"no-ssl"}
+      PIPELINE_SERVICE_CLIENT_SSL_CERT_PATH: ${PIPELINE_SERVICE_CLIENT_SSL_CERT_PATH:-""}
+      # Database configuration for MySQL
+      DB_DRIVER_CLASS: ${DB_DRIVER_CLASS:-com.mysql.cj.jdbc.Driver}
+      DB_SCHEME: ${DB_SCHEME:-mysql}
+      OM_DATABASE: ${OM_DATABASE:-openmetadata_db}
+      # ElasticSearch Configurations
+      ELASTICSEARCH_PORT: ${ELASTICSEARCH_PORT:-9200}
+      ELASTICSEARCH_SCHEME: ${ELASTICSEARCH_SCHEME:-http}
+      ELASTICSEARCH_USER: ${ELASTICSEARCH_USER:-""}
+      ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_PASSWORD:-""}
+      SEARCH_TYPE: ${SEARCH_TYPE:- "elasticsearch"}
+      ELASTICSEARCH_TRUST_STORE_PATH: ${ELASTICSEARCH_TRUST_STORE_PATH:-""}
+      ELASTICSEARCH_TRUST_STORE_PASSWORD: ${ELASTICSEARCH_TRUST_STORE_PASSWORD:-""}
+      ELASTICSEARCH_CONNECTION_TIMEOUT_SECS: ${ELASTICSEARCH_CONNECTION_TIMEOUT_SECS:-5}
+      ELASTICSEARCH_SOCKET_TIMEOUT_SECS: ${ELASTICSEARCH_SOCKET_TIMEOUT_SECS:-60}
+      ELASTICSEARCH_KEEP_ALIVE_TIMEOUT_SECS: ${ELASTICSEARCH_KEEP_ALIVE_TIMEOUT_SECS:-600}
+      ELASTICSEARCH_BATCH_SIZE: ${ELASTICSEARCH_BATCH_SIZE:-100}
+      ELASTICSEARCH_PAYLOAD_BYTES_SIZE: ${ELASTICSEARCH_PAYLOAD_BYTES_SIZE:-10485760} #max payLoadSize in Bytes
+      ELASTICSEARCH_INDEX_MAPPING_LANG: ${ELASTICSEARCH_INDEX_MAPPING_LANG:-EN}
+
+      #eventMonitoringConfiguration
+      EVENT_MONITOR: ${EVENT_MONITOR:-prometheus}
+      EVENT_MONITOR_BATCH_SIZE: ${EVENT_MONITOR_BATCH_SIZE:-10}
+      EVENT_MONITOR_PATH_PATTERN: ${EVENT_MONITOR_PATH_PATTERN:-["/api/v1/tables/*", "/api/v1/health-check"]}
+      EVENT_MONITOR_LATENCY: ${EVENT_MONITOR_LATENCY:-[]}
+
+      #pipelineServiceClientConfiguration
+      PIPELINE_SERVICE_CLIENT_ENABLED: ${PIPELINE_SERVICE_CLIENT_ENABLED:-true}
+      PIPELINE_SERVICE_CLIENT_CLASS_NAME: ${PIPELINE_SERVICE_CLIENT_CLASS_NAME:-"org.openmetadata.service.clients.pipeline.airflow.AirflowRESTClient"}
+      PIPELINE_SERVICE_IP_INFO_ENABLED: ${PIPELINE_SERVICE_IP_INFO_ENABLED:-false}
+      PIPELINE_SERVICE_CLIENT_HOST_IP: ${PIPELINE_SERVICE_CLIENT_HOST_IP:-""}
+      PIPELINE_SERVICE_CLIENT_SECRETS_MANAGER_LOADER: ${PIPELINE_SERVICE_CLIENT_SECRETS_MANAGER_LOADER:-"noop"}
+      #airflow parameters
+      AIRFLOW_USERNAME: airflow # ${AIRFLOW_USERNAME:-admin}
+      AIRFLOW_PASSWORD: airflow #${AIRFLOW_PASSWORD:-admin}
+      AIRFLOW_TIMEOUT: ${AIRFLOW_TIMEOUT:-10}
+      AIRFLOW_TRUST_STORE_PATH: ${AIRFLOW_TRUST_STORE_PATH:-""}
+      AIRFLOW_TRUST_STORE_PASSWORD: ${AIRFLOW_TRUST_STORE_PASSWORD:-""}
+      FERNET_KEY: ${FERNET_KEY:-jJ/9sz0g0OHxsfxOoSfdFdmk3ysNmPRnH3TUAbz3IHA=}
+
+      #secretsManagerConfiguration
+      SECRET_MANAGER: ${SECRET_MANAGER:-db}
+      # AWS:
+      OM_SM_REGION: ${OM_SM_REGION:-""}
+      OM_SM_ACCESS_KEY_ID: ${OM_SM_ACCESS_KEY_ID:-""}
+      OM_SM_ACCESS_KEY: ${OM_SM_ACCESS_KEY:-""}
+      # Azure:
+      OM_SM_VAULT_NAME: ${OM_SM_VAULT_NAME:-""}
+      OM_SM_CLIENT_ID: ${OM_SM_CLIENT_ID:-""}
+      OM_SM_CLIENT_SECRET: ${OM_SM_CLIENT_SECRET:-""}
+      OM_SM_TENANT_ID: ${OM_SM_TENANT_ID:-""}
+
+      #email configuration:
+      OM_EMAIL_ENTITY: ${OM_EMAIL_ENTITY:-"OpenMetadata"}
+      OM_SUPPORT_URL: ${OM_SUPPORT_URL:-"https://slack.open-metadata.org"}
+      AUTHORIZER_ENABLE_SMTP: ${AUTHORIZER_ENABLE_SMTP:-false}
+      OPENMETADATA_SERVER_URL: ${OPENMETADATA_SERVER_URL:-""}
+      OPENMETADATA_SMTP_SENDER_MAIL: ${OPENMETADATA_SMTP_SENDER_MAIL:-""}
+      SMTP_SERVER_ENDPOINT: ${SMTP_SERVER_ENDPOINT:-""}
+      SMTP_SERVER_PORT: ${SMTP_SERVER_PORT:-""}
+      SMTP_SERVER_USERNAME: ${SMTP_SERVER_USERNAME:-""}
+      SMTP_SERVER_PWD: ${SMTP_SERVER_PWD:-""}
+      SMTP_SERVER_STRATEGY: ${SMTP_SERVER_STRATEGY:-"SMTP_TLS"}
+
+      # Heap OPTS Configurations
+      OPENMETADATA_HEAP_OPTS: ${OPENMETADATA_HEAP_OPTS:--Xmx1G -Xms1G}
+      # Mask passwords values in UI
+      MASK_PASSWORDS_API: ${MASK_PASSWORDS_API:-false}
+
+      #OpenMetadata Web Configuration
+      WEB_CONF_URI_PATH: ${WEB_CONF_URI_PATH:-"/api"}
+      #HSTS
+      WEB_CONF_HSTS_ENABLED: ${WEB_CONF_HSTS_ENABLED:-false}
+      WEB_CONF_HSTS_MAX_AGE: ${WEB_CONF_HSTS_MAX_AGE:-"365 days"}
+      WEB_CONF_HSTS_INCLUDE_SUBDOMAINS: ${WEB_CONF_HSTS_INCLUDE_SUBDOMAINS:-"true"}
+      WEB_CONF_HSTS_PRELOAD: ${WEB_CONF_HSTS_PRELOAD:-"true"}
+      #Frame Options
+      WEB_CONF_FRAME_OPTION_ENABLED: ${WEB_CONF_FRAME_OPTION_ENABLED:-false}
+      WEB_CONF_FRAME_OPTION: ${WEB_CONF_FRAME_OPTION:-"SAMEORIGIN"}
+      WEB_CONF_FRAME_ORIGIN: ${WEB_CONF_FRAME_ORIGIN:-""}
+      #Content Type
+      WEB_CONF_CONTENT_TYPE_OPTIONS_ENABLED: ${WEB_CONF_CONTENT_TYPE_OPTIONS_ENABLED:-false}
+      #XSS-Protection
+      WEB_CONF_XSS_PROTECTION_ENABLED: ${WEB_CONF_XSS_PROTECTION_ENABLED:-false}
+      WEB_CONF_XSS_PROTECTION_ON: ${WEB_CONF_XSS_PROTECTION_ON:-true}
+      WEB_CONF_XSS_PROTECTION_BLOCK: ${WEB_CONF_XSS_PROTECTION_BLOCK:-true}
+      #CSP
+      WEB_CONF_XSS_CSP_ENABLED: ${WEB_CONF_XSS_CSP_ENABLED:-false}
+      WEB_CONF_XSS_CSP_POLICY: ${WEB_CONF_XSS_CSP_POLICY:-"default-src 'self'"}
+      WEB_CONF_XSS_CSP_REPORT_ONLY_POLICY: ${WEB_CONF_XSS_CSP_REPORT_ONLY_POLICY:-""}
+      #Referrer-Policy
+      WEB_CONF_REFERRER_POLICY_ENABLED: ${WEB_CONF_REFERRER_POLICY_ENABLED:-false}
+      WEB_CONF_REFERRER_POLICY_OPTION: ${WEB_CONF_REFERRER_POLICY_OPTION:-"SAME_ORIGIN"}
+      #Permission-Policy
+      WEB_CONF_PERMISSION_POLICY_ENABLED: ${WEB_CONF_PERMISSION_POLICY_ENABLED:-false}
+      WEB_CONF_PERMISSION_POLICY_OPTION: ${WEB_CONF_PERMISSION_POLICY_OPTION:-""}
+      #Cache
+      WEB_CONF_CACHE_CONTROL: ${WEB_CONF_CACHE_CONTROL:-""}
+      WEB_CONF_PRAGMA: ${WEB_CONF_PRAGMA:-""}
+
+  # This is the actual running OpenMetadata UI/API Server
+  openmetadata-server:
+    container_name: openmetadata_server
+    # Using public OpenMetadata Server image
+    image: openmetadata/server:1.3.1
+    ports:
+      - "8585:8585"
+    depends_on:
+      # Depends on migration completing successfully
+      execute-migrate-all:
+        condition: service_completed_successfully
+      openmetadata-mysql:
+        condition: service_healthy
+      openmetadata-elasticsearch:
+        condition: service_healthy
+    environment:
+      # Update DB_HOST and ELASTICSEARCH_HOST to match the service names defined here
+      DB_HOST: openmetadata-mysql
+      DB_USER_PASSWORD: openmetadata_password
+      ELASTICSEARCH_HOST: openmetadata-elasticsearch
+
+      # Other variables you provided from the university session (keep as is)
+      # ... (include ALL environment variables from your previous message here) ...
+      OPENMETADATA_CLUSTER_NAME: ${OPENMETADATA_CLUSTER_NAME:-openmetadata}
+      # ... (rest of your extensive environment variable list) ...
+
+# --- Update your volumes section at the bottom ---
 volumes:
   pgdata_airflow:
   clickhouse_data:
+  clickhouse-server-project:
+  # Add the new named volumes for OpenMetadata
+  openmetadata-db-data:
+  openmetadata-es-data:

@@ -13149,3 +13149,1089 @@ drop table if exists `default`.`dim_stop_place__dbt_backup`
 [0m14:43:15.718874 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E1098C3710>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E10EBB5A30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001E10EBB46B0>]}
 [0m14:43:15.719453 [debug] [MainThread]: Flushing usage events
 [0m14:43:16.435178 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m16:06:15.600043 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CBFE6660>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CCAE1F90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CE1A7ED0>]}
+
+
+============================== 16:06:15.633820 | 53f0d08b-3e84-47eb-8e3e-7513e283241d ==============================
+[0m16:06:15.633820 [info ] [MainThread]: Running with dbt=1.10.13
+[0m16:06:15.634797 [debug] [MainThread]: running dbt with arguments {'use_colors': 'True', 'target_path': 'None', 'no_print': 'None', 'printer_width': '80', 'log_format': 'default', 'warn_error': 'None', 'static_parser': 'True', 'partial_parse': 'True', 'fail_fast': 'False', 'send_anonymous_usage_stats': 'True', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'log_path': 'C:\\Users\\marti\\OneDrive\\Documents\\Andmetehnika (dataeng)\\dataengineering_project\\dbt\\logs', 'use_experimental_parser': 'False', 'version_check': 'True', 'introspect': 'True', 'quiet': 'False', 'empty': 'False', 'log_cache_events': 'False', 'debug': 'False', 'profiles_dir': 'C:\\Users\\marti\\OneDrive\\Documents\\Andmetehnika (dataeng)\\dataengineering_project\\dbt', 'invocation_command': 'dbt run', 'cache_selected_only': 'False', 'write_json': 'True'}
+[0m16:06:16.519036 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CC4DE190>]}
+[0m16:06:16.621433 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CE0B3020>]}
+[0m16:06:16.637287 [info ] [MainThread]: Registered adapter: clickhouse=1.9.5
+[0m16:06:17.130764 [debug] [MainThread]: checksum: 9f0c81e2574b4ff463f3d16d080df83c6982fc0372c9feeacae0504ac9ea3ffe, vars: {}, profile: , target: , version: 1.10.13
+[0m16:06:17.132807 [info ] [MainThread]: Unable to do partial parsing because saved manifest not found. Starting full parse.
+[0m16:06:17.133570 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'partial_parser', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CE265150>]}
+[0m16:06:19.742376 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CE705130>]}
+[0m16:06:19.885314 [debug] [MainThread]: Wrote artifact WritableManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\manifest.json
+[0m16:06:19.889073 [debug] [MainThread]: Wrote artifact SemanticManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\semantic_manifest.json
+[0m16:06:20.107980 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CEA6F770>]}
+[0m16:06:20.108688 [info ] [MainThread]: Found 12 models, 17 data tests, 485 macros
+[0m16:06:20.109434 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CE71BEE0>]}
+[0m16:06:20.113569 [info ] [MainThread]: 
+[0m16:06:20.114434 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m16:06:20.115196 [info ] [MainThread]: 
+[0m16:06:20.116262 [debug] [MainThread]: Acquiring new clickhouse connection 'master'
+[0m16:06:20.134552 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list_'
+[0m16:06:20.151845 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m16:06:26.313039 [debug] [ThreadPool]: dbt_clickhouse adapter: On list_: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "connection_name": "list_"} */
+
+    select name from system.databases
+  ...
+[0m16:06:26.358161 [debug] [ThreadPool]: dbt_clickhouse adapter: SQL status: OK in 0.04 seconds
+[0m16:06:26.468295 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list__default'
+[0m16:06:26.481759 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m16:06:27.037175 [debug] [ThreadPool]: dbt_clickhouse adapter: On list__default: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "connection_name": "list__default"} */
+select
+      t.name as name,
+      t.database as schema,
+      multiIf(
+        engine in ('MaterializedView', 'View'), 'view',
+        engine = 'Dictionary', 'dictionary',
+        'table'
+      ) as type,
+      db.engine as db_engine,0 as is_on_cluster
+          from system.tables as t join system.databases as db on t.database = db.name
+        where schema = 'default'
+      
+
+  ...
+[0m16:06:27.089808 [debug] [ThreadPool]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:27.095793 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CE96B890>]}
+[0m16:06:27.117881 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_live_timetable
+[0m16:06:27.119004 [info ] [Thread-1 (]: 1 of 12 START sql view model `default`.`stg_live_timetable` .................... [RUN]
+[0m16:06:27.120036 [debug] [Thread-1 (]: Acquiring new clickhouse connection 'model.dataengineering_dbt.stg_live_timetable'
+[0m16:06:27.120603 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_live_timetable
+[0m16:06:27.131043 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_live_timetable"
+[0m16:06:27.135993 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_live_timetable
+[0m16:06:27.156756 [debug] [Thread-1 (]: Creating new relation stg_live_timetable
+[0m16:06:27.179393 [debug] [Thread-1 (]: Opening a new connection, currently in state init
+[0m16:06:27.701009 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_live_timetable"
+[0m16:06:27.706020 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_live_timetable: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_live_timetable"} */
+
+
+  create or replace view `default`.`stg_live_timetable` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: SIRI live timetable from bronze
+-- Expanded to expose all Bronze columns expected by downstream silver/gold models.
+select
+  ServiceJourneyId,
+  QuayId,
+  StopPointId,
+  DateId,
+  LineId,
+  RouteId,
+  DirectionRef,
+  VehicleMode,
+  AimedArrivalTime,
+  ActualArrivalTime,
+  AimedDepartureTime,
+  ActualDepartureTime,
+  ArrivalStatus,
+  DepartureStatus,
+  Cancellation,
+  DepartureBoardingActivity,
+  Ingestion_Date
+from bronze_live_timetable
+where ServiceJourneyId is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:06:27.753765 [debug] [Thread-1 (]: dbt_clickhouse adapter: Error running SQL: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_live_timetable"} */
+
+
+  create or replace view `default`.`stg_live_timetable` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: SIRI live timetable from bronze
+-- Expanded to expose all Bronze columns expected by downstream silver/gold models.
+select
+  ServiceJourneyId,
+  QuayId,
+  StopPointId,
+  DateId,
+  LineId,
+  RouteId,
+  DirectionRef,
+  VehicleMode,
+  AimedArrivalTime,
+  ActualArrivalTime,
+  AimedDepartureTime,
+  ActualDepartureTime,
+  ArrivalStatus,
+  DepartureStatus,
+  Cancellation,
+  DepartureBoardingActivity,
+  Ingestion_Date
+from bronze_live_timetable
+where ServiceJourneyId is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    
+[0m16:06:27.809816 [debug] [Thread-1 (]: Database Error in model stg_live_timetable (models\staging\stg_live_timetable.sql)
+  Received ClickHouse exception, code: 60, server response: Code: 60. DB::Exception: Unknown table expression identifier 'default.bronze_live_timetable' in scope SELECT ServiceJourneyId, QuayId, StopPointId, DateId, LineId, RouteId, DirectionRef, VehicleMode, AimedArrivalTime, ActualArrivalTime, AimedDepartureTime, ActualDepartureTime, ArrivalStatus, DepartureStatus, Cancellation, DepartureBoardingActivity, Ingestion_Date FROM default.bronze_live_timetable WHERE ServiceJourneyId IS NOT NULL. (UNKNOWN_TABLE) (version 25.9.3.48 (official build)) (for url http://localhost:8123)
+  compiled code at target\run\dataengineering_dbt\models\staging\stg_live_timetable.sql
+[0m16:06:27.812481 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D12F7AC0>]}
+[0m16:06:27.813435 [error] [Thread-1 (]: 1 of 12 ERROR creating sql view model `default`.`stg_live_timetable` ........... [[31mERROR[0m in 0.69s]
+[0m16:06:27.814591 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_live_timetable
+[0m16:06:27.815149 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_netex_lines
+[0m16:06:27.816573 [debug] [Thread-4 (]: Marking all children of 'model.dataengineering_dbt.stg_live_timetable' to be skipped because of status 'error'.  Reason: Database Error in model stg_live_timetable (models\staging\stg_live_timetable.sql)
+  Received ClickHouse exception, code: 60, server response: Code: 60. DB::Exception: Unknown table expression identifier 'default.bronze_live_timetable' in scope SELECT ServiceJourneyId, QuayId, StopPointId, DateId, LineId, RouteId, DirectionRef, VehicleMode, AimedArrivalTime, ActualArrivalTime, AimedDepartureTime, ActualDepartureTime, ArrivalStatus, DepartureStatus, Cancellation, DepartureBoardingActivity, Ingestion_Date FROM default.bronze_live_timetable WHERE ServiceJourneyId IS NOT NULL. (UNKNOWN_TABLE) (version 25.9.3.48 (official build)) (for url http://localhost:8123)
+  compiled code at target\run\dataengineering_dbt\models\staging\stg_live_timetable.sql.
+[0m16:06:27.815814 [info ] [Thread-1 (]: 2 of 12 START sql view model `default`.`stg_netex_lines` ....................... [RUN]
+[0m16:06:27.819340 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_live_timetable, now model.dataengineering_dbt.stg_netex_lines)
+[0m16:06:27.820029 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_netex_lines
+[0m16:06:27.823790 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_netex_lines"
+[0m16:06:27.825557 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_netex_lines
+[0m16:06:27.828385 [debug] [Thread-1 (]: Relation stg_netex_lines already exists, replacing it
+[0m16:06:27.844048 [debug] [Thread-1 (]: Model mvs to replace ['stg_netex_lines_mv']
+[0m16:06:27.847410 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_lines"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.stg_netex_lines'
+  
+  ...
+[0m16:06:27.895627 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:27.900572 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_netex_lines"
+[0m16:06:27.902393 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_lines"} */
+
+
+  create or replace view `default`.`stg_netex_lines` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: NetEx lines from bronze
+select
+  id,
+  -- Use ClickHouse JSON extraction functions instead of parse_json(...) syntax
+  -- JSONExtractString returns the string value for the given key
+  JSONExtractString(payload, 'Name') as name,
+  JSONExtractString(payload, 'PublicCode') as public_code,
+  -- Optional route / direction fields (may be absent in some NetEx payloads)
+  JSONExtractString(payload, 'RouteRef') as route_id,
+  JSONExtractString(payload, 'DirectionRef') as direction,
+  Ingestion_Date
+from bronze_netex_lines
+where id is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:06:27.956174 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:27.987161 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D18C2A30>]}
+[0m16:06:27.988083 [info ] [Thread-1 (]: 2 of 12 OK created sql view model `default`.`stg_netex_lines` .................. [[32mOK[0m in 0.17s]
+[0m16:06:27.989123 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_netex_lines
+[0m16:06:27.989659 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_netex_quays
+[0m16:06:27.990301 [info ] [Thread-1 (]: 3 of 12 START sql view model `default`.`stg_netex_quays` ....................... [RUN]
+[0m16:06:27.991353 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_netex_lines, now model.dataengineering_dbt.stg_netex_quays)
+[0m16:06:27.992041 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_netex_quays
+[0m16:06:27.994979 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_netex_quays"
+[0m16:06:27.996960 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_netex_quays
+[0m16:06:28.000050 [debug] [Thread-1 (]: Relation stg_netex_quays already exists, replacing it
+[0m16:06:28.001042 [debug] [Thread-1 (]: Model mvs to replace ['stg_netex_quays_mv']
+[0m16:06:28.002010 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_quays: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_quays"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.stg_netex_quays'
+  
+  ...
+[0m16:06:28.050564 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.053542 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_netex_quays"
+[0m16:06:28.055251 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_quays: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_quays"} */
+
+
+  create or replace view `default`.`stg_netex_quays` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: NetEx quays from bronze
+select
+  id as QuayId,
+  JSONExtractString(payload, 'name') as QuayName,
+  JSONExtractString(payload, 'stopPlaceId') as StopPlaceId, --ParentStopPointId,
+  -- Location composed from centroid latitude/longitude if present in the payload
+  concat(
+    coalesce(JSONExtractString(payload, 'Centroid_Lat'), ''),
+    ',',
+    coalesce(JSONExtractString(payload, 'Centroid_Long'), '')
+  ) as Location,
+  Ingestion_Date
+from bronze_netex_quays
+where id is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:06:28.106876 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.109370 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D178EA50>]}
+[0m16:06:28.110114 [info ] [Thread-1 (]: 3 of 12 OK created sql view model `default`.`stg_netex_quays` .................. [[32mOK[0m in 0.12s]
+[0m16:06:28.111227 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_netex_quays
+[0m16:06:28.111764 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:06:28.112373 [info ] [Thread-1 (]: 4 of 12 START sql view model `default`.`stg_netex_stopplaces` .................. [RUN]
+[0m16:06:28.113209 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_netex_quays, now model.dataengineering_dbt.stg_netex_stopplaces)
+[0m16:06:28.113731 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:06:28.117328 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_netex_stopplaces"
+[0m16:06:28.121274 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:06:28.124672 [debug] [Thread-1 (]: Relation stg_netex_stopplaces already exists, replacing it
+[0m16:06:28.125339 [debug] [Thread-1 (]: Model mvs to replace ['stg_netex_stopplaces_mv']
+[0m16:06:28.125999 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_stopplaces: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_stopplaces"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.stg_netex_stopplaces'
+  
+  ...
+[0m16:06:28.174614 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.176967 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_netex_stopplaces"
+[0m16:06:28.179282 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_stopplaces: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_stopplaces"} */
+
+
+  create or replace view `default`.`stg_netex_stopplaces` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: NeTEx stop places from bronze
+-- Expanded to expose all Bronze columns expected by downstream silver/gold models.
+SELECT
+  --id,
+  JSONExtractString(payload, 'id') AS StopPlaceId,
+--  JSONExtractString(payload, 'StopPointId') AS StopPointId,
+  JSONExtractString(payload, 'Name') AS Name,
+  JSONExtractString(payload, 'ShortName') AS ShortName,
+  JSONExtractFloat(payload, 'Centroid_Long') AS Centroid_Long,
+  JSONExtractFloat(payload, 'Centroid_Lat') AS Centroid_Lat,
+  JSONExtractString(payload, 'StopPlaceType') AS StopPlaceType,
+  JSONExtractString(payload, 'ParentStopPlaceId') AS ParentStopPlaceId,
+  Ingestion_Date AS Ingestion_Date
+FROM bronze_netex_stop_places
+WHERE JSONExtractString(payload, 'id') IS NOT NULL
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:06:28.234440 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.239435 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D170BCB0>]}
+[0m16:06:28.240950 [info ] [Thread-1 (]: 4 of 12 OK created sql view model `default`.`stg_netex_stopplaces` ............. [[32mOK[0m in 0.13s]
+[0m16:06:28.242592 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:06:28.243938 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.silver_timetable
+[0m16:06:28.245654 [info ] [Thread-1 (]: 5 of 12 SKIP relation default.silver_timetable ................................. [[33mSKIP[0m]
+[0m16:06:28.247886 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.silver_timetable
+[0m16:06:28.249696 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.silver_lines
+[0m16:06:28.251996 [info ] [Thread-1 (]: 6 of 12 START sql view model `default`.`silver_lines` .......................... [RUN]
+[0m16:06:28.254440 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_netex_stopplaces, now model.dataengineering_dbt.silver_lines)
+[0m16:06:28.255292 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.silver_lines
+[0m16:06:28.260435 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.silver_lines"
+[0m16:06:28.263282 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.silver_lines
+[0m16:06:28.266221 [debug] [Thread-1 (]: Relation silver_lines already exists, replacing it
+[0m16:06:28.267154 [debug] [Thread-1 (]: Model mvs to replace ['silver_lines_mv']
+[0m16:06:28.268346 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_lines"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.silver_lines'
+  
+  ...
+[0m16:06:28.314969 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.318658 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.silver_lines"
+[0m16:06:28.322564 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_lines"} */
+
+
+  create or replace view `default`.`silver_lines` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Silver layer: deduplicate lines with route and direction
+select
+  id,
+  name,
+  public_code,
+  route_id,
+  direction,
+  Ingestion_Date
+from `default`.`stg_netex_lines`
+group by id, name, public_code, route_id, direction, Ingestion_Date
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:06:28.373634 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.376653 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D189D970>]}
+[0m16:06:28.377567 [info ] [Thread-1 (]: 6 of 12 OK created sql view model `default`.`silver_lines` ..................... [[32mOK[0m in 0.12s]
+[0m16:06:28.378804 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.silver_lines
+[0m16:06:28.379538 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.silver_stop_places
+[0m16:06:28.380651 [info ] [Thread-1 (]: 7 of 12 START sql view model `default`.`silver_stop_places` .................... [RUN]
+[0m16:06:28.382523 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.silver_lines, now model.dataengineering_dbt.silver_stop_places)
+[0m16:06:28.383900 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.silver_stop_places
+[0m16:06:28.390368 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.silver_stop_places"
+[0m16:06:28.394148 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.silver_stop_places
+[0m16:06:28.397421 [debug] [Thread-1 (]: Relation silver_stop_places already exists, replacing it
+[0m16:06:28.398175 [debug] [Thread-1 (]: Model mvs to replace ['silver_stop_places_mv']
+[0m16:06:28.399237 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_stop_places: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_stop_places"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.silver_stop_places'
+  
+  ...
+[0m16:06:28.451912 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.455447 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.silver_stop_places"
+[0m16:06:28.458386 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_stop_places: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_stop_places"} */
+
+
+  create or replace view `default`.`silver_stop_places` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Silver layer: clean stop places with all required fields
+select
+  StopPlaceId,
+  --StopPointId,
+  Name,
+  ShortName,
+  Centroid_Long,
+  Centroid_Lat,
+  StopPlaceType,
+  ParentStopPlaceId,
+  Ingestion_Date
+from `default`.`stg_netex_stopplaces`
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:06:28.509715 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.512919 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D189F050>]}
+[0m16:06:28.513930 [info ] [Thread-1 (]: 7 of 12 OK created sql view model `default`.`silver_stop_places` ............... [[32mOK[0m in 0.13s]
+[0m16:06:28.515218 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.silver_stop_places
+[0m16:06:28.515919 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_quay
+[0m16:06:28.516898 [info ] [Thread-1 (]: 8 of 12 SKIP relation default.dim_quay ......................................... [[33mSKIP[0m]
+[0m16:06:28.519101 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_quay
+[0m16:06:28.520498 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_service_journey
+[0m16:06:28.521799 [info ] [Thread-1 (]: 9 of 12 SKIP relation default.dim_service_journey .............................. [[33mSKIP[0m]
+[0m16:06:28.523755 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_service_journey
+[0m16:06:28.525215 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.fact_movements
+[0m16:06:28.526456 [info ] [Thread-1 (]: 10 of 12 SKIP relation default.fact_movements .................................. [[33mSKIP[0m]
+[0m16:06:28.528230 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.fact_movements
+[0m16:06:28.529414 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_line
+[0m16:06:28.530460 [info ] [Thread-1 (]: 11 of 12 START sql table model `default`.`dim_line` ............................ [RUN]
+[0m16:06:28.531601 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.silver_stop_places, now model.dataengineering_dbt.dim_line)
+[0m16:06:28.532680 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.dim_line
+[0m16:06:28.539766 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.dim_line"
+[0m16:06:28.542970 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.dim_line
+[0m16:06:28.659381 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+
+            
+
+    
+        create table `default`.`dim_line__dbt_backup`
+        
+  
+        
+  engine = MergeTree()
+        
+      order by (tuple())
+        
+        
+        
+        
+                    -- end_of_sql
+                    SETTINGS replicated_deduplication_window='0'
+
+                    
+            empty
+          as (
+            -- Expanded Line dimension
+select
+  id as line_id,
+  name,
+  public_code,
+  route_id,
+  direction
+from `default`.`silver_lines`
+          )
+        
+        ...
+[0m16:06:28.713998 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.763182 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+
+    select name, type from system.columns where table = 'dim_line__dbt_backup'
+    
+      
+        and database = 'default'
+      
+    
+    order by position
+  ...
+[0m16:06:28.811423 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:06:28.821806 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.dim_line"
+[0m16:06:28.825575 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+
+  
+    
+    
+    
+        
+         
+
+
+        insert into `default`.`dim_line__dbt_backup`
+        ("line_id", "name", "public_code", "route_id", "direction")-- Expanded Line dimension
+select
+  id as line_id,
+  name,
+  public_code,
+  route_id,
+  direction
+from `default`.`silver_lines`
+  ...
+[0m16:06:28.889173 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.06 seconds
+[0m16:06:28.898205 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+EXCHANGE TABLES `default`.`dim_line__dbt_backup` AND `default`.`dim_line` 
+  
+  ...
+[0m16:06:28.907578 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.01 seconds
+[0m16:06:28.920694 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+drop table if exists `default`.`dim_line__dbt_backup` 
+  ...
+[0m16:06:28.965539 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.04 seconds
+[0m16:06:28.969006 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '53f0d08b-3e84-47eb-8e3e-7513e283241d', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D189F650>]}
+[0m16:06:28.970350 [info ] [Thread-1 (]: 11 of 12 OK created sql table model `default`.`dim_line` ....................... [[32mOK[0m in 0.44s]
+[0m16:06:28.972150 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_line
+[0m16:06:28.973509 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_stop_place
+[0m16:06:28.975429 [info ] [Thread-1 (]: 12 of 12 SKIP relation default.dim_stop_place .................................. [[33mSKIP[0m]
+[0m16:06:28.977399 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_stop_place
+[0m16:06:28.981296 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m16:06:28.982400 [debug] [MainThread]: Connection 'list_' was left open.
+[0m16:06:28.983732 [debug] [MainThread]: On list_: Close
+[0m16:06:28.984645 [debug] [MainThread]: Connection 'list__default' was left open.
+[0m16:06:28.985668 [debug] [MainThread]: On list__default: Close
+[0m16:06:28.986436 [debug] [MainThread]: Connection 'model.dataengineering_dbt.dim_line' was left open.
+[0m16:06:28.987474 [debug] [MainThread]: On model.dataengineering_dbt.dim_line: Close
+[0m16:06:28.989260 [info ] [MainThread]: 
+[0m16:06:28.990238 [info ] [MainThread]: Finished running 5 table models, 7 view models in 0 hours 0 minutes and 8.87 seconds (8.87s).
+[0m16:06:28.996448 [debug] [MainThread]: Command end result
+[0m16:06:29.063633 [debug] [MainThread]: Wrote artifact WritableManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\manifest.json
+[0m16:06:29.069652 [debug] [MainThread]: Wrote artifact SemanticManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\semantic_manifest.json
+[0m16:06:29.087004 [debug] [MainThread]: Wrote artifact RunExecutionResult to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\run_results.json
+[0m16:06:29.087715 [info ] [MainThread]: 
+[0m16:06:29.088629 [info ] [MainThread]: [31mCompleted with 1 error, 0 partial successes, and 0 warnings:[0m
+[0m16:06:29.089549 [info ] [MainThread]: 
+[0m16:06:29.090769 [error] [MainThread]: [31mFailure in model stg_live_timetable (models\staging\stg_live_timetable.sql)[0m
+[0m16:06:29.092444 [error] [MainThread]:   Database Error in model stg_live_timetable (models\staging\stg_live_timetable.sql)
+  Received ClickHouse exception, code: 60, server response: Code: 60. DB::Exception: Unknown table expression identifier 'default.bronze_live_timetable' in scope SELECT ServiceJourneyId, QuayId, StopPointId, DateId, LineId, RouteId, DirectionRef, VehicleMode, AimedArrivalTime, ActualArrivalTime, AimedDepartureTime, ActualDepartureTime, ArrivalStatus, DepartureStatus, Cancellation, DepartureBoardingActivity, Ingestion_Date FROM default.bronze_live_timetable WHERE ServiceJourneyId IS NOT NULL. (UNKNOWN_TABLE) (version 25.9.3.48 (official build)) (for url http://localhost:8123)
+  compiled code at target\run\dataengineering_dbt\models\staging\stg_live_timetable.sql
+[0m16:06:29.093751 [info ] [MainThread]: 
+[0m16:06:29.095326 [info ] [MainThread]:   compiled code at target\compiled\dataengineering_dbt\models\staging\stg_live_timetable.sql
+[0m16:06:29.097325 [info ] [MainThread]: 
+[0m16:06:29.098975 [info ] [MainThread]: Done. PASS=6 WARN=0 ERROR=1 SKIP=5 NO-OP=0 TOTAL=12
+[0m16:06:29.102627 [debug] [MainThread]: Command `dbt run` failed at 16:06:29.102081 after 13.82 seconds
+[0m16:06:29.104383 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221CB95FEF0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D1792B10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000221D1790470>]}
+[0m16:06:29.105669 [debug] [MainThread]: Flushing usage events
+[0m16:06:29.719990 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m16:25:30.326670 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FBFE76660>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC0971F90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC2037ED0>]}
+
+
+============================== 16:25:30.335408 | 384ec47e-43f1-42dd-8967-787fda016dbc ==============================
+[0m16:25:30.335408 [info ] [MainThread]: Running with dbt=1.10.13
+[0m16:25:30.336496 [debug] [MainThread]: running dbt with arguments {'target_path': 'None', 'no_print': 'None', 'log_format': 'default', 'printer_width': '80', 'use_colors': 'True', 'warn_error': 'None', 'log_path': 'C:\\Users\\marti\\OneDrive\\Documents\\Andmetehnika (dataeng)\\dataengineering_project\\dbt\\logs', 'fail_fast': 'False', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'indirect_selection': 'eager', 'version_check': 'True', 'use_experimental_parser': 'False', 'quiet': 'False', 'introspect': 'True', 'empty': 'False', 'log_cache_events': 'False', 'debug': 'False', 'profiles_dir': 'C:\\Users\\marti\\OneDrive\\Documents\\Andmetehnika (dataeng)\\dataengineering_project\\dbt', 'invocation_command': 'dbt run', 'cache_selected_only': 'False', 'write_json': 'True'}
+[0m16:25:31.026843 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC036E190>]}
+[0m16:25:31.283313 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC1F43020>]}
+[0m16:25:31.289872 [info ] [MainThread]: Registered adapter: clickhouse=1.9.5
+[0m16:25:32.197727 [debug] [MainThread]: checksum: 9f0c81e2574b4ff463f3d16d080df83c6982fc0372c9feeacae0504ac9ea3ffe, vars: {}, profile: , target: , version: 1.10.13
+[0m16:25:32.687939 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m16:25:32.688774 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m16:25:32.793702 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC2655050>]}
+[0m16:25:32.992973 [debug] [MainThread]: Wrote artifact WritableManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\manifest.json
+[0m16:25:32.998006 [debug] [MainThread]: Wrote artifact SemanticManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\semantic_manifest.json
+[0m16:25:33.060065 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FBFE6E030>]}
+[0m16:25:33.061094 [info ] [MainThread]: Found 12 models, 17 data tests, 485 macros
+[0m16:25:33.062009 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC2367850>]}
+[0m16:25:33.068101 [info ] [MainThread]: 
+[0m16:25:33.069888 [info ] [MainThread]: Concurrency: 1 threads (target='dev')
+[0m16:25:33.071027 [info ] [MainThread]: 
+[0m16:25:33.072651 [debug] [MainThread]: Acquiring new clickhouse connection 'master'
+[0m16:25:33.092564 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list_'
+[0m16:25:33.119815 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m16:25:36.077789 [debug] [ThreadPool]: dbt_clickhouse adapter: On list_: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "connection_name": "list_"} */
+
+    select name from system.databases
+  ...
+[0m16:25:36.126825 [debug] [ThreadPool]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:36.162573 [debug] [ThreadPool]: Acquiring new clickhouse connection 'list__default'
+[0m16:25:36.173034 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m16:25:36.705534 [debug] [ThreadPool]: dbt_clickhouse adapter: On list__default: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "connection_name": "list__default"} */
+select
+      t.name as name,
+      t.database as schema,
+      multiIf(
+        engine in ('MaterializedView', 'View'), 'view',
+        engine = 'Dictionary', 'dictionary',
+        'table'
+      ) as type,
+      db.engine as db_engine,0 as is_on_cluster
+          from system.tables as t join system.databases as db on t.database = db.name
+        where schema = 'default'
+      
+
+  ...
+[0m16:25:36.757066 [debug] [ThreadPool]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:36.768244 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC26FFC70>]}
+[0m16:25:36.776247 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_live_timetable
+[0m16:25:36.777887 [info ] [Thread-1 (]: 1 of 12 START sql view model `default`.`stg_live_timetable` .................... [RUN]
+[0m16:25:36.779945 [debug] [Thread-1 (]: Acquiring new clickhouse connection 'model.dataengineering_dbt.stg_live_timetable'
+[0m16:25:36.781297 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_live_timetable
+[0m16:25:36.797717 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_live_timetable"
+[0m16:25:36.804249 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_live_timetable
+[0m16:25:36.835534 [debug] [Thread-1 (]: Creating new relation stg_live_timetable
+[0m16:25:36.868495 [debug] [Thread-1 (]: Opening a new connection, currently in state init
+[0m16:25:37.397850 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_live_timetable"
+[0m16:25:37.401720 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_live_timetable: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_live_timetable"} */
+
+
+  create or replace view `default`.`stg_live_timetable` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: SIRI live timetable from bronze
+-- Expanded to expose all Bronze columns expected by downstream silver/gold models.
+select
+  ServiceJourneyId,
+  QuayId,
+  StopPointId,
+  DateId,
+  LineId,
+  RouteId,
+  DirectionRef,
+  VehicleMode,
+  AimedArrivalTime,
+  ActualArrivalTime,
+  AimedDepartureTime,
+  ActualDepartureTime,
+  ArrivalStatus,
+  DepartureStatus,
+  Cancellation,
+  DepartureBoardingActivity,
+  Ingestion_Date
+from bronze_live_timetable
+where ServiceJourneyId is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:25:37.453942 [debug] [Thread-1 (]: dbt_clickhouse adapter: Error running SQL: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_live_timetable"} */
+
+
+  create or replace view `default`.`stg_live_timetable` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: SIRI live timetable from bronze
+-- Expanded to expose all Bronze columns expected by downstream silver/gold models.
+select
+  ServiceJourneyId,
+  QuayId,
+  StopPointId,
+  DateId,
+  LineId,
+  RouteId,
+  DirectionRef,
+  VehicleMode,
+  AimedArrivalTime,
+  ActualArrivalTime,
+  AimedDepartureTime,
+  ActualDepartureTime,
+  ArrivalStatus,
+  DepartureStatus,
+  Cancellation,
+  DepartureBoardingActivity,
+  Ingestion_Date
+from bronze_live_timetable
+where ServiceJourneyId is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    
+[0m16:25:37.477741 [debug] [Thread-1 (]: Database Error in model stg_live_timetable (models\staging\stg_live_timetable.sql)
+  Received ClickHouse exception, code: 60, server response: Code: 60. DB::Exception: Unknown table expression identifier 'default.bronze_live_timetable' in scope SELECT ServiceJourneyId, QuayId, StopPointId, DateId, LineId, RouteId, DirectionRef, VehicleMode, AimedArrivalTime, ActualArrivalTime, AimedDepartureTime, ActualDepartureTime, ArrivalStatus, DepartureStatus, Cancellation, DepartureBoardingActivity, Ingestion_Date FROM default.bronze_live_timetable WHERE ServiceJourneyId IS NOT NULL. (UNKNOWN_TABLE) (version 25.9.3.48 (official build)) (for url http://localhost:8123)
+  compiled code at target\run\dataengineering_dbt\models\staging\stg_live_timetable.sql
+[0m16:25:37.481283 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC52DCAD0>]}
+[0m16:25:37.482523 [error] [Thread-1 (]: 1 of 12 ERROR creating sql view model `default`.`stg_live_timetable` ........... [[31mERROR[0m in 0.70s]
+[0m16:25:37.485449 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_live_timetable
+[0m16:25:37.487266 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_netex_lines
+[0m16:25:37.488985 [debug] [Thread-4 (]: Marking all children of 'model.dataengineering_dbt.stg_live_timetable' to be skipped because of status 'error'.  Reason: Database Error in model stg_live_timetable (models\staging\stg_live_timetable.sql)
+  Received ClickHouse exception, code: 60, server response: Code: 60. DB::Exception: Unknown table expression identifier 'default.bronze_live_timetable' in scope SELECT ServiceJourneyId, QuayId, StopPointId, DateId, LineId, RouteId, DirectionRef, VehicleMode, AimedArrivalTime, ActualArrivalTime, AimedDepartureTime, ActualDepartureTime, ArrivalStatus, DepartureStatus, Cancellation, DepartureBoardingActivity, Ingestion_Date FROM default.bronze_live_timetable WHERE ServiceJourneyId IS NOT NULL. (UNKNOWN_TABLE) (version 25.9.3.48 (official build)) (for url http://localhost:8123)
+  compiled code at target\run\dataengineering_dbt\models\staging\stg_live_timetable.sql.
+[0m16:25:37.490332 [info ] [Thread-1 (]: 2 of 12 START sql view model `default`.`stg_netex_lines` ....................... [RUN]
+[0m16:25:37.493857 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_live_timetable, now model.dataengineering_dbt.stg_netex_lines)
+[0m16:25:37.495111 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_netex_lines
+[0m16:25:37.500442 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_netex_lines"
+[0m16:25:37.504266 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_netex_lines
+[0m16:25:37.509244 [debug] [Thread-1 (]: Relation stg_netex_lines already exists, replacing it
+[0m16:25:37.531665 [debug] [Thread-1 (]: Model mvs to replace ['stg_netex_lines_mv']
+[0m16:25:37.539331 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_lines"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.stg_netex_lines'
+  
+  ...
+[0m16:25:37.596986 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.06 seconds
+[0m16:25:37.605263 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_netex_lines"
+[0m16:25:37.609253 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_lines"} */
+
+
+  create or replace view `default`.`stg_netex_lines` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: NetEx lines from bronze
+select
+  id,
+  -- Use ClickHouse JSON extraction functions instead of parse_json(...) syntax
+  -- JSONExtractString returns the string value for the given key
+  JSONExtractString(payload, 'Name') as name,
+  JSONExtractString(payload, 'PublicCode') as public_code,
+  -- Optional route / direction fields (may be absent in some NetEx payloads)
+  JSONExtractString(payload, 'RouteRef') as route_id,
+  JSONExtractString(payload, 'DirectionRef') as direction,
+  Ingestion_Date
+from bronze_netex_lines
+where id is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:25:37.664864 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:37.724414 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC539C940>]}
+[0m16:25:37.725835 [info ] [Thread-1 (]: 2 of 12 OK created sql view model `default`.`stg_netex_lines` .................. [[32mOK[0m in 0.23s]
+[0m16:25:37.728573 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_netex_lines
+[0m16:25:37.729731 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_netex_quays
+[0m16:25:37.730967 [info ] [Thread-1 (]: 3 of 12 START sql view model `default`.`stg_netex_quays` ....................... [RUN]
+[0m16:25:37.733405 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_netex_lines, now model.dataengineering_dbt.stg_netex_quays)
+[0m16:25:37.735092 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_netex_quays
+[0m16:25:37.741256 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_netex_quays"
+[0m16:25:37.744079 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_netex_quays
+[0m16:25:37.750884 [debug] [Thread-1 (]: Relation stg_netex_quays already exists, replacing it
+[0m16:25:37.753118 [debug] [Thread-1 (]: Model mvs to replace ['stg_netex_quays_mv']
+[0m16:25:37.755497 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_quays: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_quays"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.stg_netex_quays'
+  
+  ...
+[0m16:25:37.806011 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:37.810748 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_netex_quays"
+[0m16:25:37.813674 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_quays: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_quays"} */
+
+
+  create or replace view `default`.`stg_netex_quays` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: NetEx quays from bronze
+select
+  id as QuayId,
+  JSONExtractString(payload, 'name') as QuayName,
+  JSONExtractString(payload, 'stopPlaceId') as StopPlaceId, --ParentStopPointId,
+  -- Location composed from centroid latitude/longitude if present in the payload
+  concat(
+    coalesce(JSONExtractString(payload, 'Centroid_Lat'), ''),
+    ',',
+    coalesce(JSONExtractString(payload, 'Centroid_Long'), '')
+  ) as Location,
+  Ingestion_Date
+from bronze_netex_quays
+where id is not null
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:25:37.868865 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:37.873612 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC548CFF0>]}
+[0m16:25:37.874867 [info ] [Thread-1 (]: 3 of 12 OK created sql view model `default`.`stg_netex_quays` .................. [[32mOK[0m in 0.14s]
+[0m16:25:37.876735 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_netex_quays
+[0m16:25:37.877837 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:25:37.879222 [info ] [Thread-1 (]: 4 of 12 START sql view model `default`.`stg_netex_stopplaces` .................. [RUN]
+[0m16:25:37.880657 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_netex_quays, now model.dataengineering_dbt.stg_netex_stopplaces)
+[0m16:25:37.882016 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:25:37.888540 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.stg_netex_stopplaces"
+[0m16:25:37.891746 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:25:37.896291 [debug] [Thread-1 (]: Relation stg_netex_stopplaces already exists, replacing it
+[0m16:25:37.897342 [debug] [Thread-1 (]: Model mvs to replace ['stg_netex_stopplaces_mv']
+[0m16:25:37.898316 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_stopplaces: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_stopplaces"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.stg_netex_stopplaces'
+  
+  ...
+[0m16:25:37.947964 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:37.952671 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.stg_netex_stopplaces"
+[0m16:25:37.955269 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.stg_netex_stopplaces: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.stg_netex_stopplaces"} */
+
+
+  create or replace view `default`.`stg_netex_stopplaces` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Staging model: NeTEx stop places from bronze
+-- Expanded to expose all Bronze columns expected by downstream silver/gold models.
+SELECT
+  --id,
+  JSONExtractString(payload, 'id') AS StopPlaceId,
+--  JSONExtractString(payload, 'StopPointId') AS StopPointId,
+  JSONExtractString(payload, 'Name') AS Name,
+  JSONExtractString(payload, 'ShortName') AS ShortName,
+  JSONExtractFloat(payload, 'Centroid_Long') AS Centroid_Long,
+  JSONExtractFloat(payload, 'Centroid_Lat') AS Centroid_Lat,
+  JSONExtractString(payload, 'StopPlaceType') AS StopPlaceType,
+  JSONExtractString(payload, 'ParentStopPlaceId') AS ParentStopPlaceId,
+  Ingestion_Date AS Ingestion_Date
+FROM bronze_netex_stop_places
+WHERE JSONExtractString(payload, 'id') IS NOT NULL
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:25:38.011905 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.018894 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FBDEB39D0>]}
+[0m16:25:38.020739 [info ] [Thread-1 (]: 4 of 12 OK created sql view model `default`.`stg_netex_stopplaces` ............. [[32mOK[0m in 0.14s]
+[0m16:25:38.022840 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.stg_netex_stopplaces
+[0m16:25:38.024324 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.silver_timetable
+[0m16:25:38.025634 [info ] [Thread-1 (]: 5 of 12 SKIP relation default.silver_timetable ................................. [[33mSKIP[0m]
+[0m16:25:38.027291 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.silver_timetable
+[0m16:25:38.029109 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.silver_lines
+[0m16:25:38.030587 [info ] [Thread-1 (]: 6 of 12 START sql view model `default`.`silver_lines` .......................... [RUN]
+[0m16:25:38.032523 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.stg_netex_stopplaces, now model.dataengineering_dbt.silver_lines)
+[0m16:25:38.034194 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.silver_lines
+[0m16:25:38.042058 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.silver_lines"
+[0m16:25:38.044619 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.silver_lines
+[0m16:25:38.049316 [debug] [Thread-1 (]: Relation silver_lines already exists, replacing it
+[0m16:25:38.051052 [debug] [Thread-1 (]: Model mvs to replace ['silver_lines_mv']
+[0m16:25:38.053780 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_lines"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.silver_lines'
+  
+  ...
+[0m16:25:38.108598 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.113588 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.silver_lines"
+[0m16:25:38.116211 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_lines: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_lines"} */
+
+
+  create or replace view `default`.`silver_lines` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Silver layer: deduplicate lines with route and direction
+select
+  id,
+  name,
+  public_code,
+  route_id,
+  direction,
+  Ingestion_Date
+from `default`.`stg_netex_lines`
+group by id, name, public_code, route_id, direction, Ingestion_Date
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:25:38.168090 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.172240 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC09C1A20>]}
+[0m16:25:38.173639 [info ] [Thread-1 (]: 6 of 12 OK created sql view model `default`.`silver_lines` ..................... [[32mOK[0m in 0.14s]
+[0m16:25:38.175205 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.silver_lines
+[0m16:25:38.176475 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.silver_stop_places
+[0m16:25:38.178491 [info ] [Thread-1 (]: 7 of 12 START sql view model `default`.`silver_stop_places` .................... [RUN]
+[0m16:25:38.180193 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.silver_lines, now model.dataengineering_dbt.silver_stop_places)
+[0m16:25:38.181925 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.silver_stop_places
+[0m16:25:38.190104 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.silver_stop_places"
+[0m16:25:38.192068 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.silver_stop_places
+[0m16:25:38.196249 [debug] [Thread-1 (]: Relation silver_stop_places already exists, replacing it
+[0m16:25:38.197649 [debug] [Thread-1 (]: Model mvs to replace ['silver_stop_places_mv']
+[0m16:25:38.198752 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_stop_places: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_stop_places"} */
+
+    
+    select name
+    from system.tables
+    where engine = 'MaterializedView'
+      and extract(create_table_query, 'TO\\s+([^\\s(]+)') = 'default.silver_stop_places'
+  
+  ...
+[0m16:25:38.248049 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.251684 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.silver_stop_places"
+[0m16:25:38.253859 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.silver_stop_places: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.silver_stop_places"} */
+
+
+  create or replace view `default`.`silver_stop_places` 
+  
+    
+  
+  
+    
+    
+  as (
+    -- Silver layer: clean stop places with all required fields
+select
+  StopPlaceId,
+  --StopPointId,
+  Name,
+  ShortName,
+  Centroid_Long,
+  Centroid_Lat,
+  StopPlaceType,
+  ParentStopPlaceId,
+  Ingestion_Date
+from `default`.`stg_netex_stopplaces`
+    
+  )
+      
+      
+                    -- end_of_sql
+                    
+                    ...
+[0m16:25:38.307547 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.312427 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC546A1B0>]}
+[0m16:25:38.313597 [info ] [Thread-1 (]: 7 of 12 OK created sql view model `default`.`silver_stop_places` ............... [[32mOK[0m in 0.13s]
+[0m16:25:38.315353 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.silver_stop_places
+[0m16:25:38.316570 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_quay
+[0m16:25:38.317926 [info ] [Thread-1 (]: 8 of 12 SKIP relation default.dim_quay ......................................... [[33mSKIP[0m]
+[0m16:25:38.319838 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_quay
+[0m16:25:38.321250 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_service_journey
+[0m16:25:38.323002 [info ] [Thread-1 (]: 9 of 12 SKIP relation default.dim_service_journey .............................. [[33mSKIP[0m]
+[0m16:25:38.325550 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_service_journey
+[0m16:25:38.326509 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.fact_movements
+[0m16:25:38.328108 [info ] [Thread-1 (]: 10 of 12 SKIP relation default.fact_movements .................................. [[33mSKIP[0m]
+[0m16:25:38.330089 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.fact_movements
+[0m16:25:38.331366 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_line
+[0m16:25:38.332898 [info ] [Thread-1 (]: 11 of 12 START sql table model `default`.`dim_line` ............................ [RUN]
+[0m16:25:38.335362 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.dataengineering_dbt.silver_stop_places, now model.dataengineering_dbt.dim_line)
+[0m16:25:38.336998 [debug] [Thread-1 (]: Began compiling node model.dataengineering_dbt.dim_line
+[0m16:25:38.343841 [debug] [Thread-1 (]: Writing injected SQL for node "model.dataengineering_dbt.dim_line"
+[0m16:25:38.347431 [debug] [Thread-1 (]: Began executing node model.dataengineering_dbt.dim_line
+[0m16:25:38.447450 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+
+            
+
+    
+        create table `default`.`dim_line__dbt_backup`
+        
+  
+        
+  engine = MergeTree()
+        
+      order by (tuple())
+        
+        
+        
+        
+                    -- end_of_sql
+                    SETTINGS replicated_deduplication_window='0'
+
+                    
+            empty
+          as (
+            -- Expanded Line dimension
+select
+  id as line_id,
+  name,
+  public_code,
+  route_id,
+  direction
+from `default`.`silver_lines`
+          )
+        
+        ...
+[0m16:25:38.503990 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.06 seconds
+[0m16:25:38.537229 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+
+    select name, type from system.columns where table = 'dim_line__dbt_backup'
+    
+      
+        and database = 'default'
+      
+    
+    order by position
+  ...
+[0m16:25:38.584217 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.590738 [debug] [Thread-1 (]: Writing runtime sql for node "model.dataengineering_dbt.dim_line"
+[0m16:25:38.673287 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+
+  
+    
+    
+    
+        
+         
+
+
+        insert into `default`.`dim_line__dbt_backup`
+        ("line_id", "name", "public_code", "route_id", "direction")-- Expanded Line dimension
+select
+  id as line_id,
+  name,
+  public_code,
+  route_id,
+  direction
+from `default`.`silver_lines`
+  ...
+[0m16:25:38.728194 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.737240 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+EXCHANGE TABLES `default`.`dim_line__dbt_backup` AND `default`.`dim_line` 
+  
+  ...
+[0m16:25:38.745340 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.01 seconds
+[0m16:25:38.756270 [debug] [Thread-1 (]: dbt_clickhouse adapter: On model.dataengineering_dbt.dim_line: /* {"app": "dbt", "dbt_version": "1.10.13", "profile_name": "dataengineering_dbt", "target_name": "dev", "node_id": "model.dataengineering_dbt.dim_line"} */
+drop table if exists `default`.`dim_line__dbt_backup` 
+  ...
+[0m16:25:38.802380 [debug] [Thread-1 (]: dbt_clickhouse adapter: SQL status: OK in 0.05 seconds
+[0m16:25:38.805122 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': '384ec47e-43f1-42dd-8967-787fda016dbc', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC54488F0>]}
+[0m16:25:38.806109 [info ] [Thread-1 (]: 11 of 12 OK created sql table model `default`.`dim_line` ....................... [[32mOK[0m in 0.47s]
+[0m16:25:38.807324 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_line
+[0m16:25:38.807986 [debug] [Thread-1 (]: Began running node model.dataengineering_dbt.dim_stop_place
+[0m16:25:38.808802 [info ] [Thread-1 (]: 12 of 12 SKIP relation default.dim_stop_place .................................. [[33mSKIP[0m]
+[0m16:25:38.809911 [debug] [Thread-1 (]: Finished running node model.dataengineering_dbt.dim_stop_place
+[0m16:25:38.812574 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m16:25:38.813149 [debug] [MainThread]: Connection 'list_' was left open.
+[0m16:25:38.813653 [debug] [MainThread]: On list_: Close
+[0m16:25:38.814097 [debug] [MainThread]: Connection 'list__default' was left open.
+[0m16:25:38.814585 [debug] [MainThread]: On list__default: Close
+[0m16:25:38.815121 [debug] [MainThread]: Connection 'model.dataengineering_dbt.dim_line' was left open.
+[0m16:25:38.815669 [debug] [MainThread]: On model.dataengineering_dbt.dim_line: Close
+[0m16:25:38.817178 [info ] [MainThread]: 
+[0m16:25:38.818655 [info ] [MainThread]: Finished running 5 table models, 7 view models in 0 hours 0 minutes and 5.74 seconds (5.74s).
+[0m16:25:38.823641 [debug] [MainThread]: Command end result
+[0m16:25:38.924926 [debug] [MainThread]: Wrote artifact WritableManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\manifest.json
+[0m16:25:38.929564 [debug] [MainThread]: Wrote artifact SemanticManifest to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\semantic_manifest.json
+[0m16:25:38.946800 [debug] [MainThread]: Wrote artifact RunExecutionResult to C:\Users\marti\OneDrive\Documents\Andmetehnika (dataeng)\dataengineering_project\dbt\target\run_results.json
+[0m16:25:38.947752 [info ] [MainThread]: 
+[0m16:25:38.948661 [info ] [MainThread]: [31mCompleted with 1 error, 0 partial successes, and 0 warnings:[0m
+[0m16:25:38.949638 [info ] [MainThread]: 
+[0m16:25:38.951723 [error] [MainThread]: [31mFailure in model stg_live_timetable (models\staging\stg_live_timetable.sql)[0m
+[0m16:25:38.953798 [error] [MainThread]:   Database Error in model stg_live_timetable (models\staging\stg_live_timetable.sql)
+  Received ClickHouse exception, code: 60, server response: Code: 60. DB::Exception: Unknown table expression identifier 'default.bronze_live_timetable' in scope SELECT ServiceJourneyId, QuayId, StopPointId, DateId, LineId, RouteId, DirectionRef, VehicleMode, AimedArrivalTime, ActualArrivalTime, AimedDepartureTime, ActualDepartureTime, ArrivalStatus, DepartureStatus, Cancellation, DepartureBoardingActivity, Ingestion_Date FROM default.bronze_live_timetable WHERE ServiceJourneyId IS NOT NULL. (UNKNOWN_TABLE) (version 25.9.3.48 (official build)) (for url http://localhost:8123)
+  compiled code at target\run\dataengineering_dbt\models\staging\stg_live_timetable.sql
+[0m16:25:38.954881 [info ] [MainThread]: 
+[0m16:25:38.956683 [info ] [MainThread]:   compiled code at target\compiled\dataengineering_dbt\models\staging\stg_live_timetable.sql
+[0m16:25:38.958316 [info ] [MainThread]: 
+[0m16:25:38.959479 [info ] [MainThread]: Done. PASS=6 WARN=0 ERROR=1 SKIP=5 NO-OP=0 TOTAL=12
+[0m16:25:38.962267 [debug] [MainThread]: Command `dbt run` failed at 16:25:38.961906 after 8.97 seconds
+[0m16:25:38.962984 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FBFB5A4B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC4F4FEF0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021FC4F4FCB0>]}
+[0m16:25:38.963644 [debug] [MainThread]: Flushing usage events
+[0m16:25:39.550635 [debug] [MainThread]: An error was encountered while trying to flush usage events

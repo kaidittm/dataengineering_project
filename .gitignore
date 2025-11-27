@@ -1,6 +1,32 @@
-*.env
+# Environment variables (contains secrets)
+.env
 
-logs/*
-pgdata_airflow/*
-dbt/target
-dbt/profiles.yml
+# Airflow/General Logs and Data
+logs/
+data/
+data_samples/ # If these are generated samples, ignore them
+
+# Docker Volumes/Persistent Data
+docker-volume/db-data/
+docker-volume/es-data/
+pgdata_airflow/
+
+# dbt Artifacts
+# This assumes the target directory is generated during a 'dbt run'
+dbt/target/ 
+
+
+# Python artifacts
+*.pyc
+__pycache__
+
+# Logs and runtime artifacts
+*.log
+logs/
+dbt/logs/
+
+# Environment-specific configuration and secrets
+profiles.yml
+config.json
+
+
