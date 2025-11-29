@@ -1,22 +1,33 @@
-FROM apache/airflow:2.8.1-python3.11
+FROM apache/airflow:2.7.3-python3.11
 
-# Switch to root to install scripts
 USER root
 
-# Copy helper scripts and make executable
-COPY scripts/wait_for_services.sh /opt/airflow/scripts/wait_for_services.sh
-RUN chmod +x /opt/airflow/scripts/wait_for_services.sh
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    git \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Switch back to airflow user for pip installations
 USER airflow
 
-# Install all Python packages needed for DAGs and dbt
+# Install Python packages
 RUN pip install --no-cache-dir \
-    clickhouse-connect \
-    lxml \
     requests \
+    lxml \
     pandas \
-    dbt-core==1.7.4 \
-    dbt-clickhouse==1.7.2
+    clickhouse-connect \
+    pyarrow \
+    dbt-core \
+    dbt-clickhouse \
+    pyiceberg[s3fs,pyarrow] \
+    sqlalchemy \
+    s3fs \
+    boto3
 
-WORKDIR /opt/airflow
+# Create wait script for services
+COPY --chown=airflow:root scripts/wait_for_services.sh /opt/airflow/scripts/wait_for_services.sh
+RUN chmod +x /opt/airflow/scripts/wait_for_services.sh
