@@ -77,6 +77,8 @@ services:
       - CATALOG_S3_ACCESS__KEY__ID=minioadmin
       - CATALOG_S3_SECRET__ACCESS__KEY=minioadmin
       - CATALOG_S3_PATH__STYLE__ACCESS=true
+      - AWS_REGION=us-east-1
+      - AWS_DEFAULT_REGION=us-east-1
     depends_on:
       minio-setup:
         condition: service_completed_successfully
@@ -191,7 +193,7 @@ services:
       minio:
         condition: service_healthy
       iceberg-rest:
-        condition: service_healthy
+        condition: service_started
     restart: always
 
   # --- Airflow Scheduler ---

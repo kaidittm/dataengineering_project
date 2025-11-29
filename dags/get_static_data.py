@@ -10,6 +10,10 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 import logging
+import subprocess
+import pyarrow as pa
+from pyiceberg.catalog import load_catalog
+from pyiceberg.exceptions import NoSuchTableError, NamespaceAlreadyExistsError
 
 logger = logging.getLogger(__name__)
 
@@ -312,7 +316,7 @@ def fetch_parse_and_load_static(**ctx):
         jps_dfs = []
         jp_stops_dfs = []
 
-        # 3. Process files one at a time (streaming approach)
+        # 3. Process files one at a time
         with zipfile.ZipFile(io.BytesIO(zip_bytes)) as z:
             xml_files = [name for name in z.namelist() if name.lower().endswith('.xml')]
             logger.info(f"Found {len(xml_files)} XML files to process")
@@ -463,10 +467,6 @@ def _run_dbt_local(**ctx):
     Runs dbt using the dbt installation in the project folder.
     Logs and compilation artifacts are stored in Airflow-writable folders.
     """
-    import os
-    import subprocess
-    import logging
-
     logger = logging.getLogger(__name__)
     logger.info("Running dbt locally")
 
@@ -524,6 +524,125 @@ def _run_dbt_local(**ctx):
         raise
 
 
+def write_to_iceberg(**ctx):
+    """
+    Read today's bronze_netex_lines from ClickHouse,
+    write them into an Iceberg table via REST catalog (MinIO S3),
+    and create a ClickHouse S3 view for querying.
+    """
+    logger.info("Starting Iceberg write operation")
+
+    # 1. Fetch ingestion date
+    ingestion_date = pd.Timestamp.utcnow().date()
+    ds_str = ctx.get('ds')
+    if ds_str:
+        try:
+            ingestion_date = pd.to_datetime(ds_str).date()
+        except Exception:
+            pass
+
+    # 2. Fetch data from ClickHouse
+    with get_clickhouse_client() as client:
+        query = f"""
+            SELECT dataset, id, version, payload,
+                   Ingestion_Timestamp, Ingestion_Date
+            FROM bronze_netex_lines
+            WHERE Ingestion_Date = '{ingestion_date}'
+        """
+        result = client.query(query)
+    rows = result.result_rows
+    if not rows:
+        logger.warning("No rows found for today's bronze_netex_lines")
+        return
+
+    df = pd.DataFrame(
+        rows,
+        columns=[
+            "dataset", "id", "version", "payload",
+            "Ingestion_Timestamp", "Ingestion_Date"
+        ]
+    )
+
+    # 3. Convert types for Arrow
+    df["dataset"] = df["dataset"].astype(str)
+    df["id"] = df["id"].astype(str)
+    df["version"] = df["version"].fillna("").astype(str)
+    df["payload"] = df["payload"].astype(str)
+    df["Ingestion_Timestamp"] = pd.to_datetime(df["Ingestion_Timestamp"])
+    df["Ingestion_Date"] = pd.to_datetime(df["Ingestion_Date"])
+
+    # 4. Convert to Arrow Table
+    pa_table = pa.Table.from_pandas(df)
+    # Cast timestamp columns to microsecond precision
+    pa_table = pa_table.cast(pa.schema([
+        ('dataset', pa.string()),
+        ('id', pa.string()),
+        ('version', pa.string()),
+        ('payload', pa.string()),
+        ('Ingestion_Timestamp', pa.timestamp('us')),
+        ('Ingestion_Date', pa.timestamp('us')),
+    ]))
+    logger.info(f"Prepared Arrow table with {pa_table.num_rows} rows")
+
+    # 5. Connect to PyIceberg REST Catalog
+    catalog = load_catalog(
+        name="rest",
+        type="rest",
+        uri=os.getenv("ICEBERG_CATALOG_URI", "http://iceberg-rest:8181"),
+        **{
+            "s3.endpoint": os.getenv("AWS_S3_ENDPOINT", "http://minio:9000"),
+            "s3.access-key-id": os.getenv("AWS_ACCESS_KEY_ID", "minioadmin"),
+            "s3.secret-access-key": os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin"),
+            "s3.path-style-access": "true",
+        }
+    )
+    logger.info("Connected to Iceberg catalog")
+
+    namespace = "bronze"
+    table_name = "netex_lines_iceberg"
+    identifier = f"{namespace}.{table_name}"
+
+    # 6. Ensure namespace exists
+    try:
+        catalog.create_namespace(namespace)
+        logger.info(f"Created namespace: {namespace}")
+    except NamespaceAlreadyExistsError:
+        logger.info(f"Namespace already exists: {namespace}")
+
+    # 7. Drop table if exists
+    try:
+        catalog.drop_table(identifier)
+        logger.info(f"Table {identifier} existed and was dropped")
+    except NoSuchTableError:
+        logger.info(f"Table {identifier} did not exist, skipping drop")
+
+    # 8. Create Iceberg table
+    table = catalog.create_table(
+        identifier=identifier,
+        schema=pa_table.schema,
+        location=f"s3://warehouse/{namespace}/{table_name}"
+    )
+    logger.info(f"Created Iceberg table: {identifier}")
+
+    # 9. Append data
+    table.append(pa_table)
+    logger.info(f"Appended {pa_table.num_rows} rows to {identifier}")
+
+    # 10. Create ClickHouse S3 view
+    with get_clickhouse_client() as client:
+        create_view_sql = f"""
+        CREATE OR REPLACE VIEW iceberg_netex_lines AS
+        SELECT dataset, id, version, payload, Ingestion_Timestamp, Ingestion_Date
+        FROM s3(
+            'http://minio:9000/warehouse/{namespace}/{table_name}/**/*.parquet',
+            '{os.getenv("AWS_ACCESS_KEY_ID","minioadmin")}',
+            '{os.getenv("AWS_SECRET_ACCESS_KEY","minioadmin")}',
+            'Parquet'
+        )
+        """
+        client.command(create_view_sql)
+        logger.info("Created ClickHouse S3 view: iceberg_netex_lines")
+
 with DAG(
     dag_id="get_static_netex",
     start_date=days_ago(1),
@@ -545,7 +664,14 @@ with DAG(
         provide_context=True
     )
 
-    # Task 3: Run dbt transformations
+    # Task 3: Write to Iceberg
+    write_iceberg_task = PythonOperator(
+        task_id="write_to_iceberg",
+        python_callable=write_to_iceberg,
+        provide_context=True
+    )
+
+    # Task 4: Run dbt transformations
     run_dbt = PythonOperator(
         task_id='run_dbt_static',
         python_callable=_run_dbt_local,
@@ -553,4 +679,4 @@ with DAG(
     )
 
     # Define execution order
-    create_table_task >> fetch_and_load_task >> run_dbt
+    create_table_task >> fetch_and_load_task >> write_iceberg_task >> run_dbt
