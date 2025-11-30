@@ -1,5 +1,4 @@
 -- Staging model: NetEx lines from bronze
--- Staging model: NetEx lines from bronze
 select
   id,
   -- Use ClickHouse JSON extraction functions instead of parse_json(...) syntax

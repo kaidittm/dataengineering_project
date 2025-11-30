@@ -1,4 +1,3 @@
-
 -- Silver layer: clean timetable with all required fields
 select
   ServiceJourneyId,

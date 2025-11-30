@@ -1,8 +1,8 @@
 -- Staging model: NetEx quays from bronze
 select
   id as QuayId,
-  JSONExtractString(payload, 'Name') as QuayName,
-  JSONExtractString(payload, 'stopPlaceId') as ParentStopPointId,
+  JSONExtractString(payload, 'name') as QuayName,
+  JSONExtractString(payload, 'stopPlaceId') as StopPlaceId, --ParentStopPointId,
   -- Location composed from centroid latitude/longitude if present in the payload
   concat(
     coalesce(JSONExtractString(payload, 'Centroid_Lat'), ''),
