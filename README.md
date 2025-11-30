@@ -250,19 +250,10 @@ Substitute `<datetime>` for any valid value, for example `2025-10-27T21:54:00+00
   <caption>Our static data DAG with a task related to dbt.</caption>
 </figure>
 
-## dbt setup for our project
-
-### Setup
-- Copy `profiles.yml.example` to your local `~/.dbt/profiles.yml` and set credentials via env vars or edit directly.
-- Install dbt and ClickHouse adapter:
-  ```powershell
-  pip install dbt-core dbt-clickhouse clickhouse-connect
-  ```
-- Run models:
-  ```powershell
-  dbt run
-  dbt test
-  ```
+<figure>
+  <img width="1899" height="528" alt="image" src="https://github.com/kaidittm/dataengineering_project/blob/main/illustrations/dbt_schema.jpg"/>
+  <caption>Our DBT diagram.</caption>
+</figure>
 
 
 
