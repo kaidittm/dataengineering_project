@@ -46,7 +46,7 @@ For this:
 2. Also copy `~/dbt/profiles.yml.example` to your local `~/dbt/profiles.yml` and set credentials via env vars or edit directly.
 3. Make sure your Docker Engine is running and run `docker compose build` to install the required python packages.
 4. Run `docker compose up -d`.
-5.  Install dbt and ClickHouse adapter:
+5. (If needed) Install dbt and ClickHouse adapter:
      ```powershell
      pip install dbt-core dbt-clickhouse clickhouse-connect
      ```
@@ -58,6 +58,48 @@ For this:
 
 NB! If for some reason the `compose up` command does not start services correctly (this can be monitored more easily by running `docker compose up` without the `-d` flag), try removing the `:z` from the end of lines 14 and 30 of `compose.yml`.
 Those were added by René due to specifics of running docker on Fedora Linux, but the fix might mess up the services on other platforms (there shouldn't be a problem with Windows).
+
+##### Apache Airflow
+Apache Iceberg is set up automatically by composing the container.
+UI is accessible at: http://localhost:8081/
+If you have added the API-keys to .env file, then please trigger the two DAGs visible to start the data ingestion pipeline.
+
+##### Clickhouse
+If the DAGs have run successfully you can see the data through Clickhouse.
+UI is accessible at: http://localhost:8123/
+You can run basic SQL like "SHOW TABLES;" etc to see the created data.
+
+To create the two roles run the following commands from console:
+* Creating the roles:
+   * ```powershell
+     cat sql/clickhouse_roles.sql | docker exec -i dataengineering_project-dbt-clickhouse-1 clickhouse-client
+     ```
+* Running the checks:
+   * ```powershell
+     cat sql/clickhouse_roles_check.sql | docker exec -i dataengineering_project-dbt-clickhouse-1 clickhouse-client
+     ```
+
+##### Apache Iceberg
+Apache Iceberg is set up automatically by composing the container.
+UI is accessbile at: http://localhost:9101/
+
+##### OpenMetadata
+UI is accessible at: http://localhost:8585/ 
+For testing the connection run the following SQL in Clickhouse:
+* ```SQL
+   CREATE ROLE role_openmetadata;
+   CREATE USER service_openmetadata IDENTIFIED WITH sha256_password BY 'TrafiklabProject123';
+   GRANT role_openmetadata TO service_openmetadata;
+   GRANT SELECT, SHOW ON system.* to role_openmetadata;
+   GRANT SELECT ON default.* TO role_openmetadata;
+  ```
+* Then create a Clickhouse service with the following information:
+   * User: service_openmetadata
+   * Password: TrafiklabProject123
+   * Host and port: clickhouse:8123
+
+##### Apache Superset
+Not implemented as of now.
 
 ---
 ## About our data
