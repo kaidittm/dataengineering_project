@@ -84,6 +84,9 @@ Apache Iceberg is set up automatically by composing the container.
 UI is accessbile at: http://localhost:9101/
 
 ##### OpenMetadata
+NB! OpenMetadata additions are under branch OpenMetadata, where Iceberg is not implemented (as running Iceberg and OpenMetadata together in the same containers worked only for short periods of times as it crashed our Docker Engines).
+Meaning our main branch does not involve OpenMetadata right now (only Clickhouse additions and Iceberg).
+
 UI is accessible at: http://localhost:8585/ 
 For testing the connection run the following SQL in Clickhouse:
 * ```SQL
