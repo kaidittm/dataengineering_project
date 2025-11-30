@@ -1,8 +1,6 @@
 # Minimal Dockerfile for dbt + dbt-clickhouse + clickhouse-connect
 FROM python:3.11-slim
 
-WORKDIR /dbt
-
 # Install system dependencies for building some Python packages
 USER root
 RUN apt-get update && \
@@ -11,8 +9,19 @@ RUN apt-get update && \
         gcc \
         libffi-dev \
         git \
-        curl && \
+        curl \
+        ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
+ENV PIP_DEFAULT_TIMEOUT=240
+
 # Install dbt-core and adapters
-RUN pip install --no-cache-dir dbt-core dbt-clickhouse clickhouse-connect
+RUN python -m pip install --upgrade pip && \
+    pip install --no-cache-dir --timeout 240 "protobuf<5" "googleapis-common-protos<2" && \
+    pip install --no-cache-dir dbt-core==1.7.8 && \
+    pip install --no-cache-dir dbt-clickhouse==1.7.5 clickhouse-connect
+
+WORKDIR /usr/app
+ENV DBT_PROFILES_DIR=/usr/app
+
+ENTRYPOINT ["dbt"]

@@ -2,18 +2,20 @@ import os
 import io
 import zipfile
 import requests
-from lxml import etree
 import pandas as pd
 from typing import Tuple, Dict, Optional
 from contextlib import contextmanager
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 from airflow.utils.dates import days_ago
 import logging
 import subprocess
 import pyarrow as pa
 from pyiceberg.catalog import load_catalog
 from pyiceberg.exceptions import NoSuchTableError, NamespaceAlreadyExistsError
+
+from xml_parsers import process_xml_file
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +45,6 @@ STATIC_BRONZE_TABLES = {
 # Global client for connection pooling
 _clickhouse_client = None
 
-
 @contextmanager
 def get_clickhouse_client():
     """Context manager for ClickHouse client with connection pooling and error handling."""
@@ -70,209 +71,6 @@ def download_zip(url: str) -> bytes:
     resp = requests.get(url, stream=True, timeout=60)
     resp.raise_for_status()
     return resp.content
-
-
-def _local_name(el):
-    """Extract local name from namespaced tag."""
-    return el.tag.split('}')[-1] if isinstance(el.tag, str) else el.tag
-
-
-def parse_topographic_places(xml_root: etree._Element) -> pd.DataFrame:
-    """Parse TopographicPlace elements."""
-    rows = []
-    for el in xml_root.iter():
-        if _local_name(el) != "TopographicPlace":
-            continue
-        r = {'id': el.get('id'), 'version': el.get('version')}
-        for child in el:
-            tag = _local_name(child)
-            if tag == 'IsoCode':
-                r['IsoCode'] = child.text
-            elif tag == 'Descriptor':
-                if len(child) > 0 and child[0].text:
-                    r['Descriptor'] = child[0].text
-                elif child.text:
-                    r['Descriptor'] = child.text
-            elif tag == 'TopographicPlaceType':
-                r['TopographicPlaceType'] = child.text
-            elif tag == 'CountryRef':
-                r['CountryRef'] = child.get('ref')
-            elif tag == 'PrivateCode':
-                r['PrivateCode'] = child.text
-            elif tag == 'ParentTopographicPlaceRef':
-                r['ParentTopographicPlaceRef'] = child.get('ref')
-                r['ParentTopographicPlaceVersion'] = child.get('version')
-        rows.append(r)
-    return pd.DataFrame(rows)
-
-
-def parse_stop_places_and_quays(xml_root: etree._Element) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Parse StopPlace and Quay elements."""
-    stops_list = []
-    quays = []
-    for el in xml_root.iter():
-        if _local_name(el) != "StopPlace":
-            continue
-        el_dict = {'id': el.get('id'), 'version': el.get('version')}
-        for child in el:
-            tag = _local_name(child)
-            if tag == 'Name':
-                el_dict['Name'] = child.text
-            elif tag == 'ShortName':
-                el_dict['ShortName'] = child.text
-            elif tag == 'PrivateCode':
-                el_dict['PrivateCode'] = child.text
-            elif tag == 'Centroid':
-                lon = None
-                lat = None
-                for coord_el in child.iter():
-                    ctag = _local_name(coord_el)
-                    if ctag in ('Longitude','Long'):
-                        lon = coord_el.text
-                    elif ctag in ('Latitude','Lat'):
-                        lat = coord_el.text
-                if lon is not None:
-                    el_dict['Centroid_Long'] = lon
-                if lat is not None:
-                    el_dict['Centroid_Lat'] = lat
-            elif tag == 'TopographicPlaceRef':
-                el_dict['TopographicPlaceRef'] = child.get('ref')
-                el_dict['TopographicPlaceVersion'] = child.get('version')
-            elif tag == 'OrganisationRef':
-                el_dict['OrganisationRef'] = child.get('ref')
-            elif tag == 'ParentSiteRef':
-                el_dict['ParentSiteRef'] = child.get('ref')
-                el_dict['ParentSiteVersion'] = child.get('version')
-            elif tag == 'TransportMode':
-                el_dict['TransportMode'] = child.text
-            elif tag == 'StopPlaceType':
-                el_dict['StopPlaceType'] = child.text
-            elif tag.lower() == 'quays':
-                for quay_el in child:
-                    quays.append({
-                        'id': quay_el.get('id'),
-                        'version': quay_el.get('version'),
-                        # 'stopPlaceId': el_dict['id'],
-                        # 'name': el_dict['Name'],
-                        # 'Centroid_Long': el_dict['Centroid_Long'],
-                        # 'Centroid_Lat': el_dict['Centroid_Lat']
-                    })
-        stops_list.append(el_dict)
-    return pd.DataFrame(stops_list), pd.DataFrame(quays)
-
-
-def parse_scheduled_stop_points(xml_root: etree._Element) -> pd.DataFrame:
-    """Parse ScheduledStopPoint elements."""
-    rows = []
-    for el in xml_root.iter():
-        if _local_name(el) not in ("ScheduledStopPoint","StopPoint","StopArea","StopPointInFrame"):
-            continue
-        rec = {'id': el.get('id'), 'version': el.get('version')}
-        for child in el:
-            tag = _local_name(child)
-            if tag == 'Name':
-                rec['Name'] = child.text
-            elif tag in ('PublicCode', 'publicCode'):
-                rec['PublicCode'] = child.text
-            elif tag == 'StopPlaceRef':
-                rec['StopPlaceRef'] = child.get('ref')
-                rec['StopPlaceRefVersion'] = child.get('version')
-            elif tag == 'Centroid':
-                lon = None
-                lat = None
-                for coord_el in child.iter():
-                    ctag = _local_name(coord_el)
-                    if ctag in ('Longitude','Long'):
-                        lon = coord_el.text
-                    elif ctag in ('Latitude','Lat'):
-                        lat = coord_el.text
-                rec['Centroid_Long'] = lon
-                rec['Centroid_Lat'] = lat
-            elif tag == 'Location':
-                lat_el = child.find('.//{*}Latitude')
-                lon_el = child.find('.//{*}Longitude')
-                if lat_el is not None:
-                    rec['Centroid_Lat'] = lat_el.text
-                if lon_el is not None:
-                    rec['Centroid_Long'] = lon_el.text
-        rows.append(rec)
-    return pd.DataFrame(rows)
-
-
-def parse_lines_and_journey_patterns(xml_root: etree._Element) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Parse Line, JourneyPattern, and StopPointInJourneyPattern elements."""
-    lines = []
-    journey_patterns = []
-    jp_stops = []
-    for el in xml_root.iter():
-        lname = _local_name(el)
-        if lname == 'Line':
-            lines.append({
-                'id': el.get('id'),
-                'version': el.get('version'),
-                'Name': (el.find('.//{*}Name').text if el.find('.//{*}Name') is not None else None),
-                'PublicCode': (el.find('.//{*}PublicCode').text if el.find('.//{*}PublicCode') is not None else None),
-            })
-        elif lname == 'JourneyPattern':
-            jp_id = el.get('id')
-            jp_version = el.get('version')
-            route_ref_el = el.find('.//{*}RouteRef')
-            jp_entry = {'id': jp_id, 'version': jp_version, 'RouteRef': (route_ref_el.get('ref') if route_ref_el is not None else None)}
-            journey_patterns.append(jp_entry)
-            for spi in el.findall('.//{*}StopPointInJourneyPattern'):
-                order = spi.get('order')
-                sref_el = spi.find('.//{*}ScheduledStopPointRef')
-                scheduled_ref = sref_el.get('ref') if sref_el is not None else None
-                if scheduled_ref is None:
-                    scheduled_ref = spi.get('ref') or (spi.find('.//{*}StopPointRef').get('ref') if spi.find('.//{*}StopPointRef') is not None else None)
-                order_num = None
-                if order:
-                    try:
-                        order_num = float(order)
-                    except ValueError:
-                        logger.warning(f"Could not parse order value: {order}")
-                jp_stops.append({
-                    'journeyPatternId': jp_id,
-                    'stopOrder': order_num,
-                    'scheduledStopPointRef': scheduled_ref,
-                    'stopPointInJourneyPatternId': spi.get('id'),
-                    'forBoarding': (spi.find('.//{*}ForBoarding').text if spi.find('.//{*}ForBoarding') is not None else None),
-                    'forAlighting': (spi.find('.//{*}ForAlighting').text if spi.find('.//{*}ForAlighting') is not None else None)
-                })
-    return pd.DataFrame(lines), pd.DataFrame(journey_patterns), pd.DataFrame(jp_stops)
-
-
-def process_xml_file(zip_file: zipfile.ZipFile, filename: str) -> Optional[Dict[str, pd.DataFrame]]:
-    """
-    Process a single XML file from the ZIP archive.
-    Returns a dict with all parsed dataframes for this file.
-    """
-    try:
-        data = zip_file.read(filename)
-        root = etree.fromstring(data)
-        
-        # Parse each type once and store results
-        scheduled_df = parse_scheduled_stop_points(root)
-        topographic_df = parse_topographic_places(root)
-        stopplace_df, quays_df = parse_stop_places_and_quays(root)
-        lines_df, jp_df, jp_stops_df = parse_lines_and_journey_patterns(root)
-        
-        return {
-            'scheduled': scheduled_df,
-            'topographic': topographic_df,
-            'stopplace': stopplace_df,
-            'quays': quays_df,
-            'lines': lines_df,
-            'journey_patterns': jp_df,
-            'jp_stops': jp_stops_df
-        }
-    except etree.XMLSyntaxError as e:
-        logger.warning(f"XML parsing error in {filename}: {e}")
-        return None
-    except Exception as e:
-        logger.error(f"Unexpected error processing {filename}: {e}")
-        return None
-
 
 def create_static_bronze_tables(**ctx):
     """
@@ -461,6 +259,135 @@ def fetch_parse_and_load_static(**ctx):
         logger.error(f"Error processing NeTEx data: {e}")
         raise
 
+# def write_to_iceberg(**ctx):
+#     """
+#     Read today's bronze_netex_lines from ClickHouse,
+#     write them into an Iceberg table via REST catalog (MinIO S3),
+#     and create a ClickHouse S3 view for querying.
+#     """
+#     logger.info("Starting Iceberg write operation")
+
+#     # 1. Fetch ingestion date
+#     ingestion_date = pd.Timestamp.utcnow().date()
+#     ds_str = ctx.get('ds')
+#     if ds_str:
+#         try:
+#             ingestion_date = pd.to_datetime(ds_str).date()
+#         except Exception:
+#             pass
+
+#     # 2. Fetch data from ClickHouse
+#     with get_clickhouse_client() as client:
+#         query = f"""
+#             SELECT dataset, id, version, payload,
+#                    Ingestion_Timestamp, Ingestion_Date
+#             FROM bronze_netex_lines
+#             WHERE Ingestion_Date = '{ingestion_date}'
+#         """
+#         result = client.query(query)
+#     rows = result.result_rows
+#     if not rows:
+#         logger.warning("No rows found for today's bronze_netex_lines")
+#         return
+
+#     df = pd.DataFrame(
+#         rows,
+#         columns=[
+#             "dataset", "id", "version", "payload",
+#             "Ingestion_Timestamp", "Ingestion_Date"
+#         ]
+#     )
+
+#     # 3. Convert types for Arrow
+#     df["dataset"] = df["dataset"].astype(str)
+#     df["id"] = df["id"].astype(str)
+#     df["version"] = df["version"].fillna("").astype(str)
+#     df["payload"] = df["payload"].astype(str)
+#     df["Ingestion_Timestamp"] = pd.to_datetime(df["Ingestion_Timestamp"])
+#     df["Ingestion_Date"] = pd.to_datetime(df["Ingestion_Date"])
+
+#     # 4. Convert to Arrow Table
+#     pa_table = pa.Table.from_pandas(df)
+#     # Cast timestamp columns to microsecond precision
+#     pa_table = pa_table.cast(pa.schema([
+#         ('dataset', pa.string()),
+#         ('id', pa.string()),
+#         ('version', pa.string()),
+#         ('payload', pa.string()),
+#         ('Ingestion_Timestamp', pa.timestamp('us')),
+#         ('Ingestion_Date', pa.timestamp('us')),
+#     ]))
+#     logger.info(f"Prepared Arrow table with {pa_table.num_rows} rows")
+
+#     # 5. Connect to PyIceberg REST Catalog
+#     catalog = load_catalog(
+#         name="rest",
+#         type="rest",
+#         uri=os.getenv("ICEBERG_CATALOG_URI", "http://iceberg-rest:8181"),
+#         **{
+#             "s3.endpoint": os.getenv("AWS_S3_ENDPOINT", "http://minio:9000"),
+#             "s3.access-key-id": os.getenv("AWS_ACCESS_KEY_ID", "minioadmin"),
+#             "s3.secret-access-key": os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin"),
+#             "s3.path-style-access": "true",
+#         }
+#     )
+#     logger.info("Connected to Iceberg catalog")
+
+#     namespace = "bronze"
+#     table_name = "netex_lines_iceberg"
+#     identifier = f"{namespace}.{table_name}"
+
+#     # 6. Ensure namespace exists
+#     try:
+#         catalog.create_namespace(namespace)
+#         logger.info(f"Created namespace: {namespace}")
+#     except NamespaceAlreadyExistsError:
+#         logger.info(f"Namespace already exists: {namespace}")
+
+#     # 7. Drop table if exists
+#     try:
+#         catalog.drop_table(identifier)
+#         logger.info(f"Table {identifier} existed and was dropped")
+#     except NoSuchTableError:
+#         logger.info(f"Table {identifier} did not exist, skipping drop")
+
+#     # 8. Create Iceberg table
+#     table = catalog.create_table(
+#         identifier=identifier,
+#         schema=pa_table.schema,
+#         location=f"s3://warehouse/{namespace}/{table_name}"
+#     )
+#     logger.info(f"Created Iceberg table: {identifier}")
+
+#     # 9. Append data
+#     table.append(pa_table)
+#     logger.info(f"Appended {pa_table.num_rows} rows to {identifier}")
+
+#     # 10. Create ClickHouse S3 view
+#     with get_clickhouse_client() as client:
+#         create_view_sql = f"""
+#         CREATE OR REPLACE VIEW iceberg_netex_lines AS
+#         SELECT dataset, id, version, payload, Ingestion_Timestamp, Ingestion_Date
+#         FROM s3(
+#             'http://minio:9000/warehouse/{namespace}/{table_name}/**/*.parquet',
+#             '{os.getenv("AWS_ACCESS_KEY_ID","minioadmin")}',
+#             '{os.getenv("AWS_SECRET_ACCESS_KEY","minioadmin")}',
+#             'Parquet'
+#         )
+#         """
+#         client.command(create_view_sql)
+#         logger.info("Created ClickHouse S3 view: iceberg_netex_lines")
+
+# Paths inside the Airflow containers
+DBT_DIR = "/opt/airflow/dbt"
+DBT_BIN = "/home/airflow/.local/bin/dbt"  # dbt installed for 'airflow' user here
+
+# Common environment for all dbt commands
+DBT_ENV = {
+    "DBT_PROFILES_DIR": DBT_DIR,          # profiles.yml lives in /opt/airflow/dbt
+    "DBT_LOG_PATH": "/tmp/dbt_logs",      # write logs to a writable location
+    "DBT_TARGET_PATH": "/tmp/dbt_target", # write manifest/run artifacts to /tmp
+}
 
 def _run_dbt_local(**ctx):
     """
@@ -471,29 +398,15 @@ def _run_dbt_local(**ctx):
     logger.info("Running dbt locally")
 
     try:
-        # DAG project root
-        project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-        # DBT project folder
-        dbt_dir = os.path.join(project_dir, "dbt")
-
-        # Safe folder for DBT logs and target artifacts
-        airflow_logs_dir = os.path.join(project_dir, "airflow_dbt_logs")
-        os.makedirs(airflow_logs_dir, exist_ok=True)
-
-        dbt_log_path = os.path.join(airflow_logs_dir, "dbt.log")
-        dbt_target_dir = os.path.join(airflow_logs_dir, "target")
-        os.makedirs(dbt_target_dir, exist_ok=True)
-
         # Run dbt with safe paths
         result = subprocess.run(
             [
                 'dbt', 'run',
-                '--profiles-dir', dbt_dir,
-                '--target-path', dbt_target_dir,
+                '--profiles-dir', DBT_DIR,
+                '--target-path', DBT_ENV['DBT_TARGET_PATH'],
                 '--no-partial-parse'
             ],
-            cwd=dbt_dir,
+            cwd=DBT_DIR,
             check=True,
             capture_output=True,
             text=True,
@@ -505,7 +418,7 @@ def _run_dbt_local(**ctx):
                 'CLICKHOUSE_PASSWORD': os.getenv('CLICKHOUSE_PASSWORD', ''),
                 'CLICKHOUSE_DB': 'default',
                 'CLICKHOUSE_SCHEMA': 'analytics',
-                'DBT_LOG_PATH': dbt_log_path
+                'DBT_LOG_PATH': DBT_ENV['DBT_LOG_PATH']
             }
         )
 
@@ -522,126 +435,6 @@ def _run_dbt_local(**ctx):
     except FileNotFoundError:
         logger.error("dbt command not found. Install with: pip install dbt-core dbt-clickhouse")
         raise
-
-
-def write_to_iceberg(**ctx):
-    """
-    Read today's bronze_netex_lines from ClickHouse,
-    write them into an Iceberg table via REST catalog (MinIO S3),
-    and create a ClickHouse S3 view for querying.
-    """
-    logger.info("Starting Iceberg write operation")
-
-    # 1. Fetch ingestion date
-    ingestion_date = pd.Timestamp.utcnow().date()
-    ds_str = ctx.get('ds')
-    if ds_str:
-        try:
-            ingestion_date = pd.to_datetime(ds_str).date()
-        except Exception:
-            pass
-
-    # 2. Fetch data from ClickHouse
-    with get_clickhouse_client() as client:
-        query = f"""
-            SELECT dataset, id, version, payload,
-                   Ingestion_Timestamp, Ingestion_Date
-            FROM bronze_netex_lines
-            WHERE Ingestion_Date = '{ingestion_date}'
-        """
-        result = client.query(query)
-    rows = result.result_rows
-    if not rows:
-        logger.warning("No rows found for today's bronze_netex_lines")
-        return
-
-    df = pd.DataFrame(
-        rows,
-        columns=[
-            "dataset", "id", "version", "payload",
-            "Ingestion_Timestamp", "Ingestion_Date"
-        ]
-    )
-
-    # 3. Convert types for Arrow
-    df["dataset"] = df["dataset"].astype(str)
-    df["id"] = df["id"].astype(str)
-    df["version"] = df["version"].fillna("").astype(str)
-    df["payload"] = df["payload"].astype(str)
-    df["Ingestion_Timestamp"] = pd.to_datetime(df["Ingestion_Timestamp"])
-    df["Ingestion_Date"] = pd.to_datetime(df["Ingestion_Date"])
-
-    # 4. Convert to Arrow Table
-    pa_table = pa.Table.from_pandas(df)
-    # Cast timestamp columns to microsecond precision
-    pa_table = pa_table.cast(pa.schema([
-        ('dataset', pa.string()),
-        ('id', pa.string()),
-        ('version', pa.string()),
-        ('payload', pa.string()),
-        ('Ingestion_Timestamp', pa.timestamp('us')),
-        ('Ingestion_Date', pa.timestamp('us')),
-    ]))
-    logger.info(f"Prepared Arrow table with {pa_table.num_rows} rows")
-
-    # 5. Connect to PyIceberg REST Catalog
-    catalog = load_catalog(
-        name="rest",
-        type="rest",
-        uri=os.getenv("ICEBERG_CATALOG_URI", "http://iceberg-rest:8181"),
-        **{
-            "s3.endpoint": os.getenv("AWS_S3_ENDPOINT", "http://minio:9000"),
-            "s3.access-key-id": os.getenv("AWS_ACCESS_KEY_ID", "minioadmin"),
-            "s3.secret-access-key": os.getenv("AWS_SECRET_ACCESS_KEY", "minioadmin"),
-            "s3.path-style-access": "true",
-        }
-    )
-    logger.info("Connected to Iceberg catalog")
-
-    namespace = "bronze"
-    table_name = "netex_lines_iceberg"
-    identifier = f"{namespace}.{table_name}"
-
-    # 6. Ensure namespace exists
-    try:
-        catalog.create_namespace(namespace)
-        logger.info(f"Created namespace: {namespace}")
-    except NamespaceAlreadyExistsError:
-        logger.info(f"Namespace already exists: {namespace}")
-
-    # 7. Drop table if exists
-    try:
-        catalog.drop_table(identifier)
-        logger.info(f"Table {identifier} existed and was dropped")
-    except NoSuchTableError:
-        logger.info(f"Table {identifier} did not exist, skipping drop")
-
-    # 8. Create Iceberg table
-    table = catalog.create_table(
-        identifier=identifier,
-        schema=pa_table.schema,
-        location=f"s3://warehouse/{namespace}/{table_name}"
-    )
-    logger.info(f"Created Iceberg table: {identifier}")
-
-    # 9. Append data
-    table.append(pa_table)
-    logger.info(f"Appended {pa_table.num_rows} rows to {identifier}")
-
-    # 10. Create ClickHouse S3 view
-    with get_clickhouse_client() as client:
-        create_view_sql = f"""
-        CREATE OR REPLACE VIEW iceberg_netex_lines AS
-        SELECT dataset, id, version, payload, Ingestion_Timestamp, Ingestion_Date
-        FROM s3(
-            'http://minio:9000/warehouse/{namespace}/{table_name}/**/*.parquet',
-            '{os.getenv("AWS_ACCESS_KEY_ID","minioadmin")}',
-            '{os.getenv("AWS_SECRET_ACCESS_KEY","minioadmin")}',
-            'Parquet'
-        )
-        """
-        client.command(create_view_sql)
-        logger.info("Created ClickHouse S3 view: iceberg_netex_lines")
 
 with DAG(
     dag_id="get_static_netex",
@@ -665,10 +458,23 @@ with DAG(
     )
 
     # Task 3: Write to Iceberg
-    write_iceberg_task = PythonOperator(
-        task_id="write_to_iceberg",
-        python_callable=write_to_iceberg,
-        provide_context=True
+    #write_iceberg_task = PythonOperator(
+    #    task_id="write_to_iceberg",
+    #    python_callable=write_to_iceberg,
+    #    provide_context=True
+    #)
+
+    # Ensure writable tmp dirs for dbt artifacts/logs (Windows volume perms workaround)
+    ensure_tmp = BashOperator(
+        task_id="ensure_tmp_dirs",
+        bash_command=f"mkdir -p {DBT_ENV['DBT_LOG_PATH']} {DBT_ENV['DBT_TARGET_PATH']} && chmod -R 777 {DBT_ENV['DBT_LOG_PATH']} {DBT_ENV['DBT_TARGET_PATH']}",
+    )
+
+    # Quick sanity check that project loads and connection works
+    dbt_debug = BashOperator(
+        task_id="dbt_debug",
+        bash_command=f"cd {DBT_DIR} && {DBT_BIN} debug",
+        env=DBT_ENV,
     )
 
     # Task 4: Run dbt transformations
@@ -679,4 +485,5 @@ with DAG(
     )
 
     # Define execution order
-    create_table_task >> fetch_and_load_task >> write_iceberg_task >> run_dbt
+    #create_table_task >> fetch_and_load_task >> write_iceberg_task >> run_dbt
+    create_table_task >> fetch_and_load_task >> ensure_tmp >> dbt_debug >> run_dbt

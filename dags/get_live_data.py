@@ -11,6 +11,8 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 
+from xml_parsers import parse_est_timetable
+
 logger = logging.getLogger(__name__)
 
 # --- Configuration & Environment Variables ---
@@ -50,104 +52,6 @@ def get_clickhouse_client():
     except Exception as e:
         logger.error(f"Failed to connect to ClickHouse: {e}")
         raise
-
-
-def parse_est_timetable(est_timetable: lxml.etree._Element) -> pd.DataFrame:
-    events = []
-
-    for el in est_timetable.iter('{http://www.siri.org.uk/siri}EstimatedVehicleJourney'):
-
-        # Initialize per-journey fields
-        dt = None
-        service_journey_id = None
-        line_id = None
-        route_id = None
-        direction_ref = None
-        vehicle_mode = None
-        arrival_status = None
-        departure_status = None
-        cancellation = None
-        departure_boarding_activity = None
-
-        # First pass: extract journey-level metadata
-        for child in el:
-            if child.tag == '{http://www.siri.org.uk/siri}FramedVehicleJourneyRef':
-                for child2 in child:
-                    if child2.tag == '{http://www.siri.org.uk/siri}DataFrameRef':
-                        dt = child2.text
-                    elif child2.tag == '{http://www.siri.org.uk/siri}DatedVehicleJourneyRef':
-                        service_journey_id = child2.text
-            elif child.tag == '{http://www.siri.org.uk/siri}LineRef':
-                line_id = child.text or child.get('ref')
-            elif child.tag == '{http://www.siri.org.uk/siri}RouteRef':
-                route_id = child.text or child.get('ref')
-            elif child.tag == '{http://www.siri.org.uk/siri}DirectionRef':
-                direction_ref = child.text
-            elif child.tag == '{http://www.siri.org.uk/siri}VehicleMode':
-                vehicle_mode = child.text
-            elif child.tag == '{http://www.siri.org.uk/siri}ArrivalStatus':
-                arrival_status = child.text
-            elif child.tag == '{http://www.siri.org.uk/siri}DepartureStatus':
-                departure_status = child.text
-            elif child.tag == '{http://www.siri.org.uk/siri}Cancellation':
-                cancellation = child.text
-            elif child.tag == '{http://www.siri.org.uk/siri}DepartureBoardingActivity':
-                departure_boarding_activity = child.text
-
-        # Second pass: handle RecordedCalls
-        for recorded_calls in el.findall('{http://www.siri.org.uk/siri}RecordedCalls'):
-            for call in recorded_calls:
-                call_dict = {
-                    'Date': dt,
-                    'DateId': None,
-                    'ServiceJourneyId': service_journey_id,
-                    'LineId': line_id,
-                    'RouteId': route_id,
-                    'DirectionRef': direction_ref,
-                    'VehicleMode': vehicle_mode,
-                    'ArrivalStatus': arrival_status,
-                    'DepartureStatus': departure_status,
-                    'Cancellation': cancellation,
-                    'DepartureBoardingActivity': departure_boarding_activity
-                }
-
-                for call_param in call:
-                    if call_param.tag == '{http://www.siri.org.uk/siri}StopPointRef':
-                        call_dict['QuayId'] = call_param.text
-                        call_dict['StopPointId'] = call_param.text
-                    elif call_param.tag == '{http://www.siri.org.uk/siri}AimedArrivalTime':
-                        call_dict['AimedArrivalTime'] = call_param.text
-                    elif call_param.tag == '{http://www.siri.org.uk/siri}ActualArrivalTime':
-                        call_dict['ActualArrivalTime'] = call_param.text
-                    elif call_param.tag == '{http://www.siri.org.uk/siri}AimedDepartureTime':
-                        call_dict['AimedDepartureTime'] = call_param.text
-                    elif call_param.tag == '{http://www.siri.org.uk/siri}ActualDepartureTime':
-                        call_dict['ActualDepartureTime'] = call_param.text
-
-                # Convert DataFrameRef to DateId
-                try:
-                    if dt:
-                        call_dict['DateId'] = datetime.strptime(dt, '%Y-%m-%d').date()
-                    else:
-                        call_dict['DateId'] = None
-                except Exception:
-                    try:
-                        call_dict['DateId'] = pd.to_datetime(dt, errors='coerce').date()
-                    except Exception:
-                        call_dict['DateId'] = None
-
-                events.append(call_dict)
-
-    df = pd.DataFrame(events)
-
-    # Convert dates and times to correct dtypes
-    time_cols = ['AimedArrivalTime', 'ActualArrivalTime', 'AimedDepartureTime', 'ActualDepartureTime']
-    for col in time_cols:
-        df[col] = pd.to_datetime(df[col], errors='coerce')
-    
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce').dt.date
-
-    return df
 
 
 def create_bronze_table(**ctx):
