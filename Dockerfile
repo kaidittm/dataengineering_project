@@ -1,33 +1,27 @@
-FROM apache/airflow:2.8.1-python3.11
+FROM apache/airflow:2.10.0-python3.10
+
+ARG OM_VERSION=1.10.7
+
+ENV PIP_NO_CACHE_DIR=1
 
 USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc libffi-dev git curl \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    git \
-    curl \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
+# Install Python packages as the airflow user
 USER airflow
 
-# Install Python packages
-RUN pip install --no-cache-dir \
-    requests \
-    lxml \
-    pandas \
-    clickhouse-connect \
-    pyarrow \
-    dbt-core \
-    dbt-clickhouse \
-    pyiceberg[s3fs,pyarrow] \
-    sqlalchemy \
-    s3fs \
-    boto3
+# Airflow constraints
+RUN pip install \
+    apache-airflow-providers-openlineage==1.10.0 \
+    --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.0/constraints-3.10.txt"
 
-# Create wait script for services
-COPY --chown=airflow:root scripts/wait_for_services.sh /opt/airflow/scripts/wait_for_services.sh
-RUN chmod +x /opt/airflow/scripts/wait_for_services.sh
+# OpenMetadata APIs + deps
+RUN pip install \
+    openmetadata-managed-apis==${OM_VERSION} \
+    openmetadata-ingestion==${OM_VERSION} \
+    "clickhouse-connect>=0.7,<0.8" \
+    dbt-core==1.8.4 \
+    dbt-clickhouse==1.8.0 \
+    clickhouse-sqlalchemy clickhouse-driver "clickhouse-connect>=0.7,<0.8"
