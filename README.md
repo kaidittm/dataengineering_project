@@ -122,11 +122,9 @@ Dimension tables:
 * DimDate – The date component of the timestamp columns. Allows for analysis based on calendar components (day, week, month, year, holiday flags).
 
 
-NB!! NEEDS UPDATE!
-
 <div align="center">
   <figure>
-    <img width="509" height="428" alt="image" src="https://github.com/kaidittm/dataengineering_project/blob/main/illustrations/data_model.jpg" />
+    <img width="509" height="428" alt="image" src="https://github.com/kaidittm/dataengineering_project/blob/main/illustrations/star_schema.png" />
   </figure>
 </div>
 
