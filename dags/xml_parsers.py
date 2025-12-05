@@ -200,7 +200,7 @@ def parse_lines_and_journey_patterns(xml_root: etree._Element) -> Tuple[pd.DataF
     return pd.DataFrame(lines), pd.DataFrame(journey_patterns), pd.DataFrame(jp_stops)
 
 
-def parse_est_timetable(est_timetable: lxml.etree._Element) -> pd.DataFrame:
+def parse_est_timetable(est_timetable: etree._Element) -> pd.DataFrame:
     events = []
 
     for el in est_timetable.iter('{http://www.siri.org.uk/siri}EstimatedVehicleJourney'):
